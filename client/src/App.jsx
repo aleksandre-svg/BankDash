@@ -39,7 +39,7 @@ const App = () => {
   return (
     <>
         <NavBar/>
-        <main className="w-full h-full bg-[#F5F7FA] ml-[280px]">
+        <main className="w-full h-screen bg-[#F5F7FA] ml-[280px]">
           <Header pageTitle={'overview'}/>
           <Routes>
             <Route path="/" element={<DashboardMain/>}/>

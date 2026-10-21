@@ -24,7 +24,7 @@ const NavBar = () => {
         {
             icon: House,
             title: "Dashboard",
-            route: "/",
+            route: "/dashboard",
         },
         {
             icon: ArrowLeftRight,
@@ -37,29 +37,9 @@ const NavBar = () => {
             route: "/accounts",
         },
         {
-            icon: ChartColumn,
-            title: "Investments",
-            route: "/investments",
-        },
-        {
             icon: CreditCard,
             title: "Credit Cards",
             route: "/credit-cards",
-        },
-        {
-            icon: HandCoins,
-            title: "Loans",
-            route: "/loans",
-        },
-        {
-            icon: Wrench,
-            title: "Services",
-            route: "/services",
-        },
-        {
-            icon: BadgePercent,
-            title: "My Privileges",
-            route: "/privileges",
         },
         {
             icon: Settings,

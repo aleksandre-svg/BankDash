@@ -1,6 +1,21 @@
 import CreditCard from "./CreditCard"
+import api from "../../../../../api/axios.js"
+import { useState } from "react"
 
 const CreditCardManagement = () => {
+    // const [cards, setCards] = useState([])
+    // console.log(users)
+    
+    // useEffect(() => {
+    //     api.get('users/')
+    //         .then(response => {
+    //             setCards(response.data);
+    //         })
+    //         .catch(err => {
+    //             console.log(err)
+    //         });
+    // }, []);
+
     return (
         <section className=" flex flex-col gap-[15px] w-full">
             <div className="flex items-center w-full justify-between">

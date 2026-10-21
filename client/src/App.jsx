@@ -3,54 +3,31 @@ import Header from "./components/NavBar components/Header"
 import NavBar from "./components/NavBar components/NavBar"
 import DashboardMain from "./components/Main components/Dashboard/DashboardMain"
 import TransactionsMain from "./components/Main components/Transactions/TransactionsMain"
+import AccountsMain from "./components/Main components/Accounts/AccountsMain"
+import CreditCardsMain from "./components/Main components/Credit Cards/CreditCardsMain"
+import SettingsMain from "./components/Main components/Settings/SettingsMain"
+import Authentication from "./components/Main components/Sign in, Sign up/Authentication"
+import { useLocation } from "react-router-dom"
 
 const App = () => {
-  const routes = [
-        {
-            title: "Accounts",
-            route: "/accounts"
-        },
-        {
-            title: "Investments",
-            route: "/investments",
-        },
-        {
-            title: "Credit Cards",
-            route: "/credit-cards",
-        },
-        {
-            title: "Loans",
-            route: "/loans",
-        },
-        {
-            title: "Services",
-            route: "/services",
-        },
-        {
-            title: "My Privileges",
-            route: "/privileges",
-        },
-        {
-            title: "Settings",
-            route: "/settings",
-        }
-    ]
+  const location = useLocation()
 
   return (
     <>
-        <NavBar/>
-        <main className="w-full h-screen bg-[#F5F7FA] ml-[280px]">
-          <Header pageTitle={'overview'}/>
+        <main className={`w-full min-h-screen bg-[#F5F7FA] ${location.pathname === '/' ? '' : "ml-[240px]"}`}>
+          {
+            location.pathname === '/' ? null : <>
+              <Header pageTitle={location.pathname.slice(1).replaceAll('-', ' ')}/>
+              <NavBar/>
+            </>
+          }
           <Routes>
-            <Route path="/" element={<DashboardMain/>}/>
+            <Route path="/" element={<Authentication/>}/>
+            <Route path="/dashboard" element={<DashboardMain/>}/>
             <Route path="/transactions" element={<TransactionsMain/>}/>
-            {
-              routes.map((routeInfo) => (
-                <Route path={routeInfo.route} element={
-                  <h1>{routeInfo.title}</h1>
-                } />
-              ))
-            }
+            <Route path="/accounts" element={<AccountsMain/>}/>
+            <Route path="/credit-cards" element={<CreditCardsMain/>}/>
+            <Route path="/settings" element={<SettingsMain/>}/>
           </Routes> 
         </main>
     </>

@@ -1,7 +1,12 @@
 import { Search, Settings, BellDot } from 'lucide-react';
 import ProfilePLaceholder from '../../assets/images/profile_placeholder.png'
+import { useContext } from 'react'
+import { UserContext } from '../../App'
 
 const Header = ({pageTitle}) => {
+    const { currentUser } = useContext(UserContext)
+    console.log(currentUser)
+
     return (
         <header className='flex items-center justify-between px-[30px] py-[20px] border-b border-[#E6EFF5] w-full sticky top-0 w-[80%] bg-white z-50'>
             <div>
@@ -23,7 +28,7 @@ const Header = ({pageTitle}) => {
                 </div>
 
                 <div className='w-[60px] h-[60px] rounded-full overflow-hidden'>
-                    <img src={ProfilePLaceholder} alt="profile picture" />
+                    <img src={currentUser?.profile_picture ? currentUser?.profile_picture : ProfilePLaceholder} alt="profile picture" />
                 </div>
             </section>
         </header>

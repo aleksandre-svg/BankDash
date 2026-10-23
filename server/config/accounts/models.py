@@ -11,3 +11,4 @@ class User(AbstractUser):
     two_factor_authentication = models.BooleanField(default=False)
     prefered_currency = models.CharField(max_length=10, default="USD")
     prefered_timezone = models.CharField(max_length=50, default="UTC")
+    profile_picture = models.ImageField(upload_to='users/profile_pictures/', null=True, blank=True)

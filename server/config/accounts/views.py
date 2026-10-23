@@ -15,6 +15,7 @@ User = get_user_model()
 class LoginView(APIView):
     permission_classes = [permissions.AllowAny]
     authentication_classes = []
+    
     def post(self, request):
         email = request.data.get('email')
         password = request.data.get('password')
@@ -24,10 +25,16 @@ class LoginView(APIView):
             user = authenticate(request, username=user_obj.username, password=password)
             if user is not None:
                 login(request, user)
-                print(request.session.__dict__)
-                return Response({'detail': 'Successfully logged in.'}, status=status.HTTP_200_OK)
+                
+                request.session.save()
+                request.session.set_expiry(1209600)
+                
+                response = Response({'detail': 'Successfully logged in.'}, status=status.HTTP_200_OK)
+                return response
+                
         except User.DoesNotExist:
             pass
+            
         return Response({'detail': 'Invalid credentials.'}, status=status.HTTP_400_BAD_REQUEST)
 
 class LogoutView(APIView):

@@ -16,20 +16,25 @@ const EditProfileTab = () => {
         permanent_address: "",
         city: "",
         postal_code: "",
-        country: ""
+        country: "",
+        profile_picture: ""
     })
 
     const [success, setSuccess] = useState('')
     const [error, setError] = useState('')
+    const [profilePicture, setProfilePicture] = useState(null);
 
     const getCurrentUser = async () => {
         try {
             const response = await api.get('users/me/')
+            console.log(response.data)
             setFormData(response.data)
         } catch (err) {
             console.log(err.response?.data || "Failed to fetch user")
         }
     }
+
+
 
     useEffect(() => {
         getCurrentUser()
@@ -40,27 +45,55 @@ const EditProfileTab = () => {
         setFormData(prev => ({ ...prev, [name]: value }))
     }
 
+    const handleProfilePictureChange = (e) => {
+        if (e.target.files && e.target.files[0]) {
+            setProfilePicture(e.target.files[0])
+        }
+    }
+    
     const handleSubmit = async (e) => {
         e.preventDefault()
         setSuccess('')
         setError('')
 
+        const data = new FormData()
+
+        Object.keys(formData).forEach(key => {
+            if (key !== 'profile_picture') {
+                data.append(key, formData[key])
+            }
+        })
+
+        if (profilePicture instanceof File) {
+            data.append('profile_picture', profilePicture)
+        }
+
         try {
-            const response = await api.patch('users/me/', formData)
+            const response = await api.patch('users/me/', data, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            })
             setFormData(response.data)
             setSuccess('Profile updated successfully!')
+            setProfilePicture(null) 
         } catch (err) {
             setError(JSON.stringify(err.response?.data || "Update failed"))
         }
     }
 
     return (
-        <div className="flex flex-col lg:flex-row items-start gap-8 lg:gap-12">
+        <form className="flex flex-col lg:flex-row items-start gap-8 lg:gap-12" onSubmit={handleSubmit}>
             <div className="flex justify-center w-full lg:w-auto shrink-0 pt-2">
                 <div className="relative">
-                    <img src={profilePlaceHolder} alt="Profile avatar" className="w-28 h-28 sm:w-32 sm:h-32 rounded-full object-cover border-2 border-white shadow-sm" />
+                    <img 
+                        src={profilePicture ? URL.createObjectURL(profilePicture) : (formData.profile_picture || profilePlaceHolder)}
+                        alt="Profile avatar" 
+                        className="w-28 h-28 sm:w-32 sm:h-32 rounded-full object-cover border-2 border-white shadow-sm" 
+                    />
                     <button type="button" aria-label="Edit Profile Picture" className="absolute bottom-1 right-1 w-8 h-8 bg-[#1814F3] hover:bg-blue-700 text-white rounded-full flex items-center justify-center transition-transform hover:scale-110 shadow-md">
                         <Pencil className="w-3.5 h-3.5" />
+                        <input type="file" accept="image/*" className="w-full h-full opacity-0 absolute" name="profile_picture" onChange={handleProfilePictureChange} />
                     </button>
                 </div>
             </div>
@@ -69,7 +102,7 @@ const EditProfileTab = () => {
                 {success && <p className="text-green-600 text-sm">{success}</p>}
                 {error && <p className="text-red-600 text-sm">{error}</p>}
 
-                <form className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5" onSubmit={handleSubmit}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5" >
                     <div className="flex flex-col gap-2">
                         <label className="text-[#232323] text-sm font-normal">First Name</label>
                         <input type="text" name="first_name" value={formData.first_name || ""} onChange={handleChange} className="w-full h-12 px-4 rounded-2xl border border-slate-200/80 text-[#718EBF] text-sm focus:outline-none focus:border-[#1814F3] transition-colors" />
@@ -118,9 +151,9 @@ const EditProfileTab = () => {
                             Save
                         </button>
                     </div>
-                </form>
+                </div>
             </div>
-        </div>
+        </form>
     )
 }
 

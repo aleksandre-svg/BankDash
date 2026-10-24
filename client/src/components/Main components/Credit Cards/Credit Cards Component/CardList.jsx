@@ -48,7 +48,7 @@ const CardList = () => {
         <div className="w-full max-w-4xl font-sans">
             <div className="flex flex-col gap-3">
                 {cards.map((card) => (
-                    <div key={card.id} className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-5 flex flex-wrap lg:flex-nowrap items-center justify-between gap-4 border border-slate-100">
+                    <div key={'card-'+card.id} className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-5 flex flex-wrap lg:flex-nowrap items-center justify-between gap-4 border border-slate-100">
                         <div className="flex items-center gap-4 min-w-[150px]">
                             <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center shrink-0 ${card.bgColor}`}>
                                 <div className="relative flex items-center justify-center">

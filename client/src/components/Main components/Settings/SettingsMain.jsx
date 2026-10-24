@@ -123,7 +123,6 @@ const EditProfileTab = () => {
                         <label className="text-[#232323] text-sm font-normal">Date of Birth</label>
                         <div className="relative">
                             <input type="text" name="date_of_birth" value={formData.date_of_birth || ""} onChange={handleChange} className="w-full h-12 px-4 pr-10 rounded-2xl border border-slate-200/80 text-[#718EBF] text-sm focus:outline-none focus:border-[#1814F3] transition-colors bg-white cursor-pointer" />
-                            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#718EBF] pointer-events-none" />
                         </div>
                     </div>
                     <div className="flex flex-col gap-2">
@@ -177,39 +176,13 @@ const PreferencesTab = () => {
                     <label className="text-[#232323] text-sm font-normal">Currency</label>
                     <div className="relative">
                         <input type="text" value={preferences.currency} onChange={(e) => setPreferences({...preferences, currency: e.target.value})} className="w-full h-12 px-4 pr-10 rounded-2xl border border-slate-200/80 text-[#718EBF] text-sm focus:outline-none focus:border-[#1814F3] transition-colors bg-white" />
-                        <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#718EBF] pointer-events-none" />
                     </div>
                 </div>
                 <div className="flex flex-col gap-2">
                     <label className="text-[#232323] text-sm font-normal">Time Zone</label>
                     <div className="relative">
                         <input type="text" value={preferences.timeZone} onChange={(e) => setPreferences({...preferences, timeZone: e.target.value})} className="w-full h-12 px-4 pr-10 rounded-2xl border border-slate-200/80 text-[#718EBF] text-sm focus:outline-none focus:border-[#1814F3] transition-colors bg-white" />
-                        <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#718EBF] pointer-events-none" />
                     </div>
-                </div>
-            </div>
-
-            <div className="flex flex-col gap-4 pt-2">
-                <h3 className="text-[#232323] text-base font-medium">Notification</h3>
-                <div className="flex flex-col gap-4">
-                    <label className="flex items-center gap-4 cursor-pointer select-none">
-                        <div onClick={() => toggleSwitch('digitalCurrency')} className={`w-11 h-6 flex items-center rounded-full p-1 transition-colors duration-200 ${preferences.digitalCurrency ? 'bg-[#1814F3]' : 'bg-slate-300'}`}>
-                            <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-200 ${preferences.digitalCurrency ? 'translate-x-5' : 'translate-x-0'}`} />
-                        </div>
-                        <span className="text-[#718EBF] text-sm font-normal">I send or receive digita currency</span>
-                    </label>
-                    <label className="flex items-center gap-4 cursor-pointer select-none">
-                        <div onClick={() => toggleSwitch('merchantOrder')} className={`w-11 h-6 flex items-center rounded-full p-1 transition-colors duration-200 ${preferences.merchantOrder ? 'bg-[#1814F3]' : 'bg-slate-300'}`}>
-                            <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-200 ${preferences.merchantOrder ? 'translate-x-5' : 'translate-x-0'}`} />
-                        </div>
-                        <span className="text-[#718EBF] text-sm font-normal">I receive merchant order</span>
-                    </label>
-                    <label className="flex items-center gap-4 cursor-pointer select-none">
-                        <div onClick={() => toggleSwitch('recommendations')} className={`w-11 h-6 flex items-center rounded-full p-1 transition-colors duration-200 ${preferences.recommendations ? 'bg-[#1814F3]' : 'bg-slate-300'}`}>
-                            <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-200 ${preferences.recommendations ? 'translate-x-5' : 'translate-x-0'}`} />
-                        </div>
-                        <span className="text-[#718EBF] text-sm font-normal">There are recommendation for my account</span>
-                    </label>
                 </div>
             </div>
 
@@ -285,7 +258,7 @@ const UserSettingsContainer = () => {
             });
     }, []);
 
-    const [activeTab, setActiveTab] = useState("Security")
+    const [activeTab, setActiveTab] = useState("Edit Profile")
 
     const tabs = ["Edit Profile", "Preferences", "Security"]
 

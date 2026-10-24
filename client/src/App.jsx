@@ -27,7 +27,6 @@ const App = () => {
     getCurrentUser()
   }, [])
 
-  console.log(currentUser)
 
   return (
     <>

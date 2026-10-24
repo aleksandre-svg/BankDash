@@ -1,11 +1,17 @@
 import creditCardChip from '../../../../../assets/images/creditCardChip.png'
 import DebitCardLogo from '../../../../../assets/images/DebitCardLogo.png'
 
-const CreditCard = ({creditCardColor, creditCardBalance, creditCardHolder, creditCardValidDate, creditCardPAN, lightMode}) => {
+const CreditCard = ({ creditCardBalance, creditCardHolder, creditCardValidDate, creditCardPAN, lightMode, creditCardbank}) => {
+    const creditCardColor = {
+        ABM: '#4C49ED',
+        BRC: '#E11D48',
+        DBL: '#D97706'
+    }
     const creditCardStyle = {
-        backgroundColor: creditCardColor,
+        backgroundColor: creditCardColor[creditCardbank],
         color: lightMode ? '#343C6A' : 'white'
     }
+
 
     const creditCardHolderSplited = creditCardHolder.split(" ")
 
@@ -14,7 +20,7 @@ const CreditCard = ({creditCardColor, creditCardBalance, creditCardHolder, credi
     const creditCardPANHidden = String(creditCardPAN).slice(0, 4) + ' **** **** ' + String(creditCardPAN).slice(12)
 
     return (
-        <div className={`w-[350px] h-[235px] rounded-[25px] overflow-hidden text-white`} style={creditCardStyle}>
+        <div className={`w-full h-[235px] rounded-[25px] overflow-hidden text-white hover:shadow-md cursor-pointer hover:translate-y-[-5px] hover:scale-[1.09] hover:z-1 hover:border hover:border-[3px] duration-100`} style={creditCardStyle}>
             <div className=" w-full h-[70%] flex flex-col p-[25px] justify-between border-b">
                 <div className='flex justify-between items-center w-full'>
                     <div className='flex flex-col translate-y-[3px]'>

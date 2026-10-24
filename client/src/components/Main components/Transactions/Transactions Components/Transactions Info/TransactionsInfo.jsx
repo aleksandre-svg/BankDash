@@ -35,32 +35,29 @@ const TransactionsInfo = ({ transactionsInfo }) => {
     <>
       <div>
         <div className="flex items-center gap-[60px] border-b border-[#EBEEF2]">
-          <button 
-            className={`pb-[12px] font-semibold text-[16px] border-b-[3px] px-[10px] transition-all ${
-              filterTransaction === 'all' 
-                ? "text-[#1814F3] border-[#1814F3]" 
+          <button
+            className={`pb-[12px] font-semibold text-[16px] border-b-[3px] px-[10px] transition-all ${filterTransaction === 'all'
+                ? "text-[#1814F3] border-[#1814F3]"
                 : "text-[#718EBF] border-transparent hover:text-[#1814F3]"
-            }`} 
+              }`}
             onClick={() => setFilterTransaction('all')}
           >
             All Transactions
           </button>
-          <button 
-            className={`pb-[12px] font-semibold text-[16px] px-[10px] border-b-[3px] transition-all ${
-              filterTransaction === 'income' 
-                ? "text-[#1814F3] border-[#1814F3]" 
+          <button
+            className={`pb-[12px] font-semibold text-[16px] px-[10px] border-b-[3px] transition-all ${filterTransaction === 'income'
+                ? "text-[#1814F3] border-[#1814F3]"
                 : "text-[#718EBF] border-transparent hover:text-[#1814F3]"
-            }`} 
+              }`}
             onClick={() => setFilterTransaction('income')}
           >
             Income
           </button>
-          <button 
-            className={`pb-[12px] font-semibold text-[16px] px-[10px] border-b-[3px] transition-all ${
-              filterTransaction === 'expense' 
-                ? "text-[#1814F3] border-[#1814F3]" 
+          <button
+            className={`pb-[12px] font-semibold text-[16px] px-[10px] border-b-[3px] transition-all ${filterTransaction === 'expense'
+                ? "text-[#1814F3] border-[#1814F3]"
                 : "text-[#718EBF] border-transparent hover:text-[#1814F3]"
-            }`} 
+              }`}
             onClick={() => setFilterTransaction('expense')}
           >
             Expense
@@ -162,8 +159,8 @@ Thank you for your business!
                 key={page}
                 onClick={() => setCurrentPage(page)}
                 className={`w-9 h-9 flex items-center justify-center rounded-xl text-sm transition-all ${currentPage === page
-                    ? 'bg-[#1814F3] text-white font-semibold shadow-sm'
-                    : 'text-[#1814F3]'
+                  ? 'bg-[#1814F3] text-white font-semibold shadow-sm'
+                  : 'text-[#1814F3]'
                   }`}
               >
                 {page}

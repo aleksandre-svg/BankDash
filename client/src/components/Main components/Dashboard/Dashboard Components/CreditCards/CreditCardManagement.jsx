@@ -1,20 +1,21 @@
 import CreditCard from "./CreditCard"
 import api from "../../../../../api/axios.js"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { UserContext } from "../../../../../App.jsx"
+import { useContext } from "react"
 
 const CreditCardManagement = () => {
-    // const [cards, setCards] = useState([])
-    // console.log(users)
-    
-    // useEffect(() => {
-    //     api.get('users/')
-    //         .then(response => {
-    //             setCards(response.data);
-    //         })
-    //         .catch(err => {
-    //             console.log(err)
-    //         });
-    // }, []);
+    const { currentUser } = useContext(UserContext)
+    const [cards, setCards] = useState([])
+
+    const getCurrentUserCards = async () => {
+        const response = await api.get('cards/')
+        setCards(response.data)
+    }
+
+    useEffect(() => {
+        getCurrentUserCards()
+    }, [])
 
     return (
         <section className=" flex flex-col gap-[15px] w-full">
@@ -22,41 +23,19 @@ const CreditCardManagement = () => {
                 <h3 className="font-[600] text-[22px] text-[#343C6A]">My Cards</h3>
                 <h4 className="font-[600] text-[17px] text-[#343C6A] cursor-pointer">See All</h4>
             </div>
-            <div className="flex justify-between w-full">
-                <CreditCard 
-                    creditCardColor="#4C49ED"
-                    creditCardBalance={8245}
-                    creditCardHolder="Aleksandre Dzukaevi"
-                    creditCardValidDate="08/28"
-                    creditCardPAN={4532123412345678}
-                />
-
-                <CreditCard 
-                    creditCardColor="white"
-                    creditCardBalance={3190}
-                    creditCardHolder="Aleksandre Dzukaevi"
-                    creditCardValidDate="11/27"
-                    creditCardPAN={5214567890123456}
-                    lightMode={true}
-                />
-
-                <CreditCard 
-                    creditCardColor="#2D60FF"
-                    creditCardBalance={12650}
-                    creditCardHolder="Aleksandre Dzukaevi"
-                    creditCardValidDate="03/30"
-                    creditCardPAN={6011456789012345}
-                    lightMode={false}
-                />
-
-                <CreditCard 
-                    creditCardColor="#FCAA0B"
-                    creditCardBalance={947}
-                    creditCardHolder="Aleksandre Dzukaevi"
-                    creditCardValidDate="09/29"
-                    creditCardPAN={4111222233334444}
-                    lightMode={false}
-                />
+            <div className="flex gap-[15px] w-full">
+                {
+                    cards.map((card, card_index) => {
+                        return <CreditCard 
+                            creditCardBalance={card.balance}
+                            creditCardHolder={currentUser.first_name + ' ' + currentUser.last_name}
+                            creditCardValidDate={card.valid_date}
+                            creditCardPAN={card.card_number}
+                            creditCardbank={card.bank}
+                            key={card_index}
+                        />
+                    })
+                }
             </div>
         </section>
     )

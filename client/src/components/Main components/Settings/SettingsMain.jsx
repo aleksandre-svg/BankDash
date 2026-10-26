@@ -1,44 +1,22 @@
-
 import { useState, useEffect } from "react"
-import { ChevronDown, Hand, Pencil } from "lucide-react"
+import { Pencil, User } from "lucide-react"
 import profilePlaceHolder from "../../../assets/images/profile_placeholder.png"
+import { UserContext } from "../../../App.jsx"
+import { useContext } from "react"
 import api from '../../../api/axios.js'
 
-
 const EditProfileTab = () => {
-    const [formData, setFormData] = useState({
-        first_name: "",
-        last_name: "",
-        username: "",
-        email: "",
-        date_of_birth: "",
-        present_address: "",
-        permanent_address: "",
-        city: "",
-        postal_code: "",
-        country: "",
-        profile_picture: ""
-    })
-
+    const { currentUser } = useContext(UserContext)
+    const [formData, setFormData] = useState({})
     const [success, setSuccess] = useState('')
     const [error, setError] = useState('')
-    const [profilePicture, setProfilePicture] = useState(null);
-
-    const getCurrentUser = async () => {
-        try {
-            const response = await api.get('users/me/')
-            console.log(response.data)
-            setFormData(response.data)
-        } catch (err) {
-            console.log(err.response?.data || "Failed to fetch user")
-        }
-    }
-
-
+    const [profilePicture, setProfilePicture] = useState(null)
 
     useEffect(() => {
-        getCurrentUser()
-    }, [])
+        if (currentUser) {
+            setFormData(currentUser)
+        }
+    }, [currentUser])
 
     const handleChange = (e) => {
         const { name, value } = e.target
@@ -59,7 +37,7 @@ const EditProfileTab = () => {
         const data = new FormData()
 
         Object.keys(formData).forEach(key => {
-            if (key !== 'profile_picture') {
+            if (key !== 'profile_picture' && formData[key] !== null && formData[key] !== undefined) {
                 data.append(key, formData[key])
             }
         })
@@ -76,7 +54,7 @@ const EditProfileTab = () => {
             })
             setFormData(response.data)
             setSuccess('Profile updated successfully!')
-            setProfilePicture(null) 
+            setProfilePicture(null)
         } catch (err) {
             setError(JSON.stringify(err.response?.data || "Update failed"))
         }
@@ -87,14 +65,14 @@ const EditProfileTab = () => {
             <div className="flex justify-center w-full lg:w-auto shrink-0 pt-2">
                 <div className="relative">
                     <img 
-                        src={profilePicture ? URL.createObjectURL(profilePicture) : (formData.profile_picture || profilePlaceHolder)}
+                        src={profilePicture ? URL.createObjectURL(profilePicture) : (formData?.profile_picture || profilePlaceHolder)}
                         alt="Profile avatar" 
                         className="w-28 h-28 sm:w-32 sm:h-32 rounded-full object-cover border-2 border-white shadow-sm" 
                     />
-                    <button type="button" aria-label="Edit Profile Picture" className="absolute bottom-1 right-1 w-8 h-8 bg-[#1814F3] hover:bg-blue-700 text-white rounded-full flex items-center justify-center transition-transform hover:scale-110 shadow-md">
+                    <label aria-label="Edit Profile Picture" className="absolute bottom-1 right-1 w-8 h-8 bg-[#1814F3] hover:bg-blue-700 text-white rounded-full flex items-center justify-center transition-transform hover:scale-110 shadow-md cursor-pointer">
                         <Pencil className="w-3.5 h-3.5" />
-                        <input type="file" accept="image/*" className="w-full h-full opacity-0 absolute" name="profile_picture" onChange={handleProfilePictureChange} />
-                    </button>
+                        <input type="file" accept="image/*" className="hidden" name="profile_picture" onChange={handleProfilePictureChange} />
+                    </label>
                 </div>
             </div>
 
@@ -102,48 +80,48 @@ const EditProfileTab = () => {
                 {success && <p className="text-green-600 text-sm">{success}</p>}
                 {error && <p className="text-red-600 text-sm">{error}</p>}
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5" >
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5">
                     <div className="flex flex-col gap-2">
                         <label className="text-[#232323] text-sm font-normal">First Name</label>
-                        <input type="text" name="first_name" value={formData.first_name || ""} onChange={handleChange} className="w-full h-12 px-4 rounded-2xl border border-slate-200/80 text-[#718EBF] text-sm focus:outline-none focus:border-[#1814F3] transition-colors" />
+                        <input type="text" name="first_name" value={formData?.first_name || ""} onChange={handleChange} className="w-full h-12 px-4 rounded-2xl border border-slate-200/80 text-[#718EBF] text-sm focus:outline-none focus:border-[#1814F3] transition-colors" />
                     </div>
                     <div className="flex flex-col gap-2">
                         <label className="text-[#232323] text-sm font-normal">Last Name</label>
-                        <input type="text" name="last_name" value={formData.last_name || ""} onChange={handleChange} className="w-full h-12 px-4 rounded-2xl border border-slate-200/80 text-[#718EBF] text-sm focus:outline-none focus:border-[#1814F3] transition-colors" />
+                        <input type="text" name="last_name" value={formData?.last_name || ""} onChange={handleChange} className="w-full h-12 px-4 rounded-2xl border border-slate-200/80 text-[#718EBF] text-sm focus:outline-none focus:border-[#1814F3] transition-colors" />
                     </div>
                     <div className="flex flex-col gap-2">
                         <label className="text-[#232323] text-sm font-normal">User Name</label>
-                        <input type="text" name="username" value={formData.username || ""} onChange={handleChange} className="w-full h-12 px-4 rounded-2xl border border-slate-200/80 text-[#718EBF] text-sm focus:outline-none focus:border-[#1814F3] transition-colors" />
+                        <input type="text" name="username" value={formData?.username || ""} onChange={handleChange} className="w-full h-12 px-4 rounded-2xl border border-slate-200/80 text-[#718EBF] text-sm focus:outline-none focus:border-[#1814F3] transition-colors" />
                     </div>
                     <div className="flex flex-col gap-2">
                         <label className="text-[#232323] text-sm font-normal">Email</label>
-                        <input type="email" name="email" value={formData.email || ""} onChange={handleChange} className="w-full h-12 px-4 rounded-2xl border border-slate-200/80 text-[#718EBF] text-sm focus:outline-none focus:border-[#1814F3] transition-colors" />
+                        <input type="email" name="email" value={formData?.email || ""} onChange={handleChange} className="w-full h-12 px-4 rounded-2xl border border-slate-200/80 text-[#718EBF] text-sm focus:outline-none focus:border-[#1814F3] transition-colors" />
                     </div>
                     <div className="flex flex-col gap-2">
                         <label className="text-[#232323] text-sm font-normal">Date of Birth</label>
                         <div className="relative">
-                            <input type="text" name="date_of_birth" value={formData.date_of_birth || ""} onChange={handleChange} className="w-full h-12 px-4 pr-10 rounded-2xl border border-slate-200/80 text-[#718EBF] text-sm focus:outline-none focus:border-[#1814F3] transition-colors bg-white cursor-pointer" />
+                            <input type="text" name="date_of_birth" value={formData?.date_of_birth || ""} onChange={handleChange} className="w-full h-12 px-4 pr-10 rounded-2xl border border-slate-200/80 text-[#718EBF] text-sm focus:outline-none focus:border-[#1814F3] transition-colors bg-white cursor-pointer" />
                         </div>
                     </div>
                     <div className="flex flex-col gap-2">
                         <label className="text-[#232323] text-sm font-normal">Present Address</label>
-                        <input type="text" name="present_address" value={formData.present_address || ""} onChange={handleChange} className="w-full h-12 px-4 rounded-2xl border border-slate-200/80 text-[#718EBF] text-sm focus:outline-none focus:border-[#1814F3] transition-colors" />
+                        <input type="text" name="present_address" value={formData?.present_address || ""} onChange={handleChange} className="w-full h-12 px-4 rounded-2xl border border-slate-200/80 text-[#718EBF] text-sm focus:outline-none focus:border-[#1814F3] transition-colors" />
                     </div>
                     <div className="flex flex-col gap-2">
                         <label className="text-[#232323] text-sm font-normal">Permanent Address</label>
-                        <input type="text" name="permanent_address" value={formData.permanent_address || ""} onChange={handleChange} className="w-full h-12 px-4 rounded-2xl border border-slate-200/80 text-[#718EBF] text-sm focus:outline-none focus:border-[#1814F3] transition-colors" />
+                        <input type="text" name="permanent_address" value={formData?.permanent_address || ""} onChange={handleChange} className="w-full h-12 px-4 rounded-2xl border border-slate-200/80 text-[#718EBF] text-sm focus:outline-none focus:border-[#1814F3] transition-colors" />
                     </div>
                     <div className="flex flex-col gap-2">
                         <label className="text-[#232323] text-sm font-normal">City</label>
-                        <input type="text" name="city" value={formData.city || ""} onChange={handleChange} className="w-full h-12 px-4 rounded-2xl border border-slate-200/80 text-[#718EBF] text-sm focus:outline-none focus:border-[#1814F3] transition-colors" />
+                        <input type="text" name="city" value={formData?.city || ""} onChange={handleChange} className="w-full h-12 px-4 rounded-2xl border border-slate-200/80 text-[#718EBF] text-sm focus:outline-none focus:border-[#1814F3] transition-colors" />
                     </div>
                     <div className="flex flex-col gap-2">
                         <label className="text-[#232323] text-sm font-normal">Postal Code</label>
-                        <input type="text" name="postal_code" value={formData.postal_code || ""} onChange={handleChange} className="w-full h-12 px-4 rounded-2xl border border-slate-200/80 text-[#718EBF] text-sm focus:outline-none focus:border-[#1814F3] transition-colors" />
+                        <input type="text" name="postal_code" value={formData?.postal_code || ""} onChange={handleChange} className="w-full h-12 px-4 rounded-2xl border border-slate-200/80 text-[#718EBF] text-sm focus:outline-none focus:border-[#1814F3] transition-colors" />
                     </div>
                     <div className="flex flex-col gap-2">
                         <label className="text-[#232323] text-sm font-normal">Country</label>
-                        <input type="text" name="country" value={formData.country || ""} onChange={handleChange} className="w-full h-12 px-4 rounded-2xl border border-slate-200/80 text-[#718EBF] text-sm focus:outline-none focus:border-[#1814F3] transition-colors" />
+                        <input type="text" name="country" value={formData?.country || ""} onChange={handleChange} className="w-full h-12 px-4 rounded-2xl border border-slate-200/80 text-[#718EBF] text-sm focus:outline-none focus:border-[#1814F3] transition-colors" />
                     </div>
                     <div className="flex justify-end md:col-span-2 pt-4">
                         <button type="submit" className="w-full sm:w-auto px-12 h-12 bg-[#1814F3] hover:bg-blue-700 text-white font-medium text-sm rounded-2xl transition-colors duration-150 shadow-sm active:scale-95">
@@ -157,20 +135,43 @@ const EditProfileTab = () => {
 }
 
 const PreferencesTab = () => {
+    const { currentUser } = useContext(UserContext)
     const [preferences, setPreferences] = useState({
         currency: "",
-        timeZone: "",
-        digitalCurrency: true,
-        merchantOrder: false,
-        recommendations: true
+        timeZone: ""
     })
+    const [success, setSuccess] = useState('')
+    const [error, setError] = useState('')
 
-    const toggleSwitch = (key) => {
-        setPreferences(prev => ({ ...prev, [key]: !prev[key] }))
+    useEffect(() => {
+        if (currentUser) {
+            setPreferences({
+                currency: currentUser.prefered_currency || "",
+                timeZone: currentUser.prefered_timezone || ""
+            })
+        }
+    }, [currentUser])
+
+    const handleSubmit = async (e) => {
+        e.preventDefault()
+        setSuccess('')
+        setError('')
+
+        try {
+            await api.patch('users/me/', {
+                prefered_currency: preferences.currency,
+                prefered_timezone: preferences.timeZone
+            })
+            setSuccess('Preferences updated successfully!')
+        } catch (err) {
+            setError(JSON.stringify(err.response?.data || "Update failed"))
+        }
     }
 
     return (
-        <div className="flex flex-col gap-8">
+        <form className="flex flex-col gap-8" onSubmit={handleSubmit}>
+            {success && <p className="text-green-600 text-sm">{success}</p>}
+            {error && <p className="text-red-600 text-sm">{error}</p>}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                 <div className="flex flex-col gap-2">
                     <label className="text-[#232323] text-sm font-normal">Currency</label>
@@ -187,21 +188,36 @@ const PreferencesTab = () => {
             </div>
 
             <div className="flex justify-end pt-4">
-                <button type="button" className="w-full sm:w-auto px-12 h-12 bg-[#1814F3] hover:bg-blue-700 text-white font-medium text-sm rounded-2xl transition-colors duration-150 shadow-sm active:scale-95">
+                <button type="submit" className="w-full sm:w-auto px-12 h-12 bg-[#1814F3] hover:bg-blue-700 text-white font-medium text-sm rounded-2xl transition-colors duration-150 shadow-sm active:scale-95">
                     Save
                 </button>
             </div>
-        </div>
+        </form>
     )
 }
 
 const SecurityTab = () => {
+    const { currentUser } = useContext(UserContext)
 
     const [securityData, setSecurityData] = useState({
-        twoFactorAuth: true,
+        twoFactorAuth: false,
         currentPassword: "",
         newPassword: ""
     })
+    const [success, setSuccess] = useState('')
+    const [error, setError] = useState('')
+
+    useEffect(() => {
+        if (!currentUser) {
+            return
+        }
+
+        setSecurityData({
+            twoFactorAuth: currentUser.two_factor_authentication,
+            currentPassword: "",
+            newPassword: ""
+        })
+    }, [currentUser])
 
     const toggleTwoFactor = () => {
         setSecurityData(prev => ({ ...prev, twoFactorAuth: !prev.twoFactorAuth }))
@@ -212,8 +228,34 @@ const SecurityTab = () => {
         setSecurityData(prev => ({ ...prev, [name]: value }))
     }
 
+    const handleSubmit = async (e) => {
+        e.preventDefault()
+        setSuccess('')
+        setError('')
+
+        try {
+            await api.patch('users/me/', {
+                two_factor_authentication: securityData.twoFactorAuth
+            })
+
+            if (securityData.currentPassword && securityData.newPassword) {
+                await api.post('/change-password/', {
+                    current_password: securityData.currentPassword,
+                    new_password: securityData.newPassword
+                })
+            }
+            
+            setSecurityData(prev => ({ ...prev, currentPassword: '', newPassword: '' }))
+            setSuccess('Security settings updated successfully!')
+        } catch (err) {
+            setError(JSON.stringify(err.response?.data || "Security update failed"))
+        }
+    }
+
     return (
-        <div className="flex flex-col gap-8">
+        <form className="flex flex-col gap-8" onSubmit={handleSubmit}>
+            {success && <p className="text-green-600 text-sm">{success}</p>}
+            {error && <p className="text-red-600 text-sm">{error}</p>}
             <div className="flex flex-col gap-3">
                 <span className="text-[#232323] text-base font-medium">Two-factor Authentication</span>
                 <label className="flex items-center gap-4 cursor-pointer select-none">
@@ -237,28 +279,27 @@ const SecurityTab = () => {
             </div>
 
             <div className="flex justify-end pt-4">
-                <button type="button" className="w-full sm:w-auto px-12 h-12 bg-[#1814F3] hover:bg-blue-700 text-white font-medium text-sm rounded-2xl transition-colors duration-150 shadow-sm active:scale-95">
+                <button type="submit" className="w-full sm:w-auto px-12 h-12 bg-[#1814F3] hover:bg-blue-700 text-white font-medium text-sm rounded-2xl transition-colors duration-150 shadow-sm active:scale-95">
                     Save
                 </button>
             </div>
-        </div>
+        </form>
     )
 }
 
 const UserSettingsContainer = () => {
     const [users, setUsers] = useState([])
+    const [activeTab, setActiveTab] = useState("Edit Profile")
 
     useEffect(() => {
         api.get('users/')
             .then(response => {
-                setUsers(response.data);
+                setUsers(response.data)
             })
             .catch(err => {
                 console.log(err)
-            });
-    }, []);
-
-    const [activeTab, setActiveTab] = useState("Edit Profile")
+            })
+    }, [])
 
     const tabs = ["Edit Profile", "Preferences", "Security"]
 

@@ -3,13 +3,13 @@ import ProfilePLaceholder from '../../assets/images/profile_placeholder.png'
 import { useContext, useState } from 'react'
 import { UserContext } from '../../App'
 import { Pencil, LogOut } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import api from '../../api/axios';
 
 const Header = ({pageTitle}) => {
+    const navigate = useNavigate()
     const { currentUser } = useContext(UserContext)
     const [showMenu, setShowMenu] = useState(false)
-    console.log(currentUser)
 
     const ToggleMenu = () => setShowMenu(prev => !prev)
     const handleLogOut = async () => {
@@ -29,7 +29,9 @@ const Header = ({pageTitle}) => {
                     <input type="search" name="search_value" placeholder='Search for something' className='placeholder:text-[#8BA3CA] outline-none text-[#8BA4CB]'/>
                 </div>
 
-                <div className='w-[50px] h-[50px] bg-[#F5F7FA] rounded-full flex justify-center items-center cursor-pointer'>
+                <div className='w-[50px] h-[50px] bg-[#F5F7FA] rounded-full flex justify-center items-center cursor-pointer' onClick={() => {
+                    navigate('/settings')
+                }}>
                     <Settings color='#718EBF' size={'28px'}/>
                 </div>
 
@@ -41,7 +43,6 @@ const Header = ({pageTitle}) => {
                     <img src={currentUser?.profile_picture ? currentUser?.profile_picture : ProfilePLaceholder} alt="profile picture" />
                 </div>
 
-                {/* Animated Dropdown Menu */}
                 <div className={`w-[300px] bg-white absolute shadow-lg rounded-[15px] top-[70px] right-0 flex flex-col items-center p-[15px] gap-[15px] border border-[#E6EFF5] transition-all duration-200 origin-top-right ${
                     showMenu 
                         ? 'opacity-100 scale-100 pointer-events-auto' 
@@ -58,12 +59,12 @@ const Header = ({pageTitle}) => {
                     
                     <div className='w-full flex justify-center flex-col items-center gap-[10px]'>
                         <Link className='w-full' to='/settings'>
-                            <button className='w-[95%] py-[8px] bg-[#E8EEFF] text-[#2563EB] rounded-[5px] flex items-center justify-center gap-[5px] hover:bg-[#DBE5FF] hover:text-[#1D4ED8] transition-colors duration-200'>
+                            <button className='w-full py-[8px] bg-[#E8EEFF] text-[#2563EB] rounded-[5px] flex items-center justify-center gap-[5px] hover:bg-[#DBE5FF] hover:text-[#1D4ED8] transition-colors duration-200'>
                                 <Pencil className="w-3.5 h-3.5" />
                                 Edit Profile
                             </button>
                         </Link>
-                        <button className='w-[95%] py-[8px] bg-[#FFE8EE] text-[#E11D48] rounded-[5px] flex items-center justify-center gap-[5px] hover:bg-[#FFD1DC] transition-colors duration-200' onClick={handleLogOut}>
+                        <button className='w-[100%] py-[8px] bg-[#FFE8EE] text-[#E11D48] rounded-[5px] flex items-center justify-center gap-[5px] hover:bg-[#FFD1DC] transition-colors duration-200' onClick={handleLogOut}>
                             <LogOut className="w-3.5 h-3.5"/>
                             Log out
                         </button>

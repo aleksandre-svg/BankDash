@@ -8,8 +8,8 @@ from django.contrib.auth import authenticate, login, logout
 from rest_framework import status, permissions
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
-from rest_framework.generics import UpdateAPIView
-
+from cards.models import Card
+from cards.serializers import CardSerializer
 
 User = get_user_model()
 
@@ -47,6 +47,12 @@ class LogoutView(APIView):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    
+    @action(detail=True, methods=['get'])
+    def cards(self, request, pk=None):
+        user_cards = Card.objects.filter(card_holder_id=pk)
+        serializer = CardSerializer(user_cards, many=True)
+        return Response(serializer.data)
     
     
     @action(detail=False, methods=['get', 'put', 'patch'])

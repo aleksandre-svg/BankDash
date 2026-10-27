@@ -1,6 +1,6 @@
-import { Search, Settings, BellDot } from 'lucide-react';
+import { Search, Settings, BellDot, Check, X } from 'lucide-react';
 import ProfilePLaceholder from '../../assets/images/profile_placeholder.png'
-import { useContext, useState } from 'react'
+import { useContext, useState, useEffect, useRef } from 'react'
 import { UserContext } from '../../App'
 import { Pencil, LogOut } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
@@ -10,11 +10,73 @@ const Header = ({pageTitle}) => {
     const navigate = useNavigate()
     const { currentUser } = useContext(UserContext)
     const [showMenu, setShowMenu] = useState(false)
+    const [showNotifications, setShowNotifications] = useState(false)
+    const [notifications, setNotifications] = useState([])
+    const [unreadCount, setUnreadCount] = useState(0)
 
-    const ToggleMenu = () => setShowMenu(prev => !prev)
+    const notificationRef = useRef(null)
+
+    const ToggleMenu = () => {
+        setShowMenu(prev => !prev)
+        setShowNotifications(false)
+    }
+
+    const ToggleNotifications = () => {
+        setShowNotifications(prev => !prev)
+        setShowMenu(false)
+    }
+
     const handleLogOut = async () => {
-        const response = await api.post('logout/')
+        await api.post('logout/')
         location.replace('/')
+    }
+
+    const fetchNotifications = async () => {
+        try {
+            const response = await api.get('notifications/')
+            const data = response.data
+            setNotifications(data)
+            setUnreadCount(data.filter(n => !n.is_read).length)
+        } catch (err) {
+            console.error("Failed to fetch notifications", err)
+        }
+    }
+
+    useEffect(() => {
+        fetchNotifications()
+        const interval = setInterval(fetchNotifications, 10000)
+        return () => clearInterval(interval)
+    }, [])
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (notificationRef.current && !notificationRef.current.contains(event.target)) {
+                setShowNotifications(false)
+            }
+        }
+        document.addEventListener('mousedown', handleClickOutside)
+        return () => document.removeEventListener('mousedown', handleClickOutside)
+    }, [])
+
+    const markAsRead = async (id) => {
+        try {
+            await api.patch(`notifications/${id}/`, { is_read: true })
+            setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n))
+            setUnreadCount(prev => Math.max(0, prev - 1))
+        } catch (err) {
+            console.error("Failed to mark notification as read", err)
+        }
+    }
+
+    const markAllAsRead = async () => {
+        try {
+            await api.post('notifications/mark_all_read/')
+            setNotifications(prev => prev.map(n => ({ ...n, is_read: true })))
+            setUnreadCount(0)
+        } catch (err) {
+            // Fallback if bulk endpoint isn't set up yet
+            notifications.filter(n => !n.is_read).forEach(n => markAsRead(n.id))
+        }
     }
 
     return (
@@ -35,8 +97,69 @@ const Header = ({pageTitle}) => {
                     <Settings color='#718EBF' size={'28px'}/>
                 </div>
 
-                <div className='w-[50px] h-[50px] bg-[#F5F7FA] rounded-full flex justify-center items-center cursor-pointer'>
-                    <BellDot color='#FE5C73' size={'28px'}/>
+                <div className='relative' ref={notificationRef}>
+                    <div 
+                        className='w-[50px] h-[50px] bg-[#F5F7FA] rounded-full flex justify-center items-center cursor-pointer relative' 
+                        onClick={ToggleNotifications}
+                    >
+                        <BellDot color={unreadCount > 0 ? '#FE5C73' : '#718EBF'} size={'28px'}/>
+                        {unreadCount > 0 && (
+                            <span className='absolute top-2 right-2 w-3 h-3 bg-[#FE5C73] rounded-full border-2 border-white animate-pulse' />
+                        )}
+                    </div>
+
+                    <div className={`w-[320px] sm:w-[360px] bg-white absolute shadow-xl rounded-[20px] top-[65px] right-0 flex flex-col p-[20px] border border-[#E6EFF5] transition-all duration-200 origin-top-right z-50 ${
+                        showNotifications 
+                            ? 'opacity-100 scale-100 pointer-events-auto' 
+                            : 'opacity-0 scale-95 pointer-events-none'
+                    }`}>
+                        <div className='flex items-center justify-between pb-3 border-b border-[#E6EFF5] mb-3'>
+                            <div className='flex items-center gap-2'>
+                                <h3 className='font-bold text-[16px] text-[#343C6A]'>Notifications</h3>
+                                {unreadCount > 0 && (
+                                    <span className='bg-[#FFE8EE] text-[#FE5C73] text-[11px] font-bold px-2 py-0.5 rounded-full'>
+                                        {unreadCount} new
+                                    </span>
+                                )}
+                            </div>
+                            {unreadCount > 0 && (
+                                <button 
+                                    onClick={markAllAsRead} 
+                                    className='text-xs font-semibold text-[#2563EB] hover:underline'
+                                >
+                                    Mark all as read
+                                </button>
+                            )}
+                        </div>
+
+                        <div className='flex flex-col gap-2 max-h-[300px] overflow-y-auto pr-1'>
+                            {notifications.length === 0 ? (
+                                <p className='text-center text-sm text-[#718EBF] py-6'>No notifications yet</p>
+                            ) : (
+                                notifications.map((n) => (
+                                    <div 
+                                        key={n.id} 
+                                        onClick={() => !n.is_read && markAsRead(n.id)}
+                                        className={`p-3 rounded-[12px] flex items-start justify-between gap-3 transition-colors cursor-pointer ${
+                                            n.is_read ? 'bg-white hover:bg-[#F5F7FA]' : 'bg-[#F0F5FF] hover:bg-[#E4EEFF]'
+                                        }`}
+                                    >
+                                        <div className='flex flex-col gap-1'>
+                                            <p className={`text-xs leading-relaxed ${n.is_read ? 'text-[#718EBF]' : 'text-[#343C6A] font-semibold'}`}>
+                                                {n.message}
+                                            </p>
+                                            <span className='text-[10px] text-[#A3AED0]'>
+                                                {new Date(n.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                                            </span>
+                                        </div>
+                                        {!n.is_read && (
+                                            <span className='w-2 h-2 rounded-full bg-[#2563EB] shrink-0 mt-1' />
+                                        )}
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </div>
                 </div>
 
                 <div className='w-[60px] h-[60px] rounded-full overflow-hidden cursor-pointer' onClick={ToggleMenu}>

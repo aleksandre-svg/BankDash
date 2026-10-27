@@ -1,5 +1,4 @@
 import CreditCardManagement from "./Transactions Components/CreditCardManagement"
-import Expense from "./Transactions Components/Expense"
 import TransactionsInfo from "./Transactions Components/Transactions Info/TransactionsInfo"
 import api from "../../../api/axios"
 import { useState, useEffect, use } from "react"
@@ -30,14 +29,8 @@ const TransactionsMain = () => {
     return (
         <>
             <div className="px-[30px] py-[25px] w-full flex flex-col gap-[20px]">
-                <div className="flex gap-[30px]">
-                    <div className="w-full">
-                        <CreditCardManagement/>
-                    </div>
-
-                    <div className="w-full flex flex-col gap-[15px]">
-                        <Expense expenseData={expenseData}/>
-                    </div>
+                <div className="flex gap-[30px] w-full">
+                    <CreditCardManagement/>
                 </div>
                 <div>
                     <h2 className="text-[22px] font-[600] text-[#343C6A] pb-[20px]">Recent Transactions</h2>

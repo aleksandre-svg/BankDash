@@ -7,6 +7,7 @@ import AccountsMain from "./components/Main components/Accounts/AccountsMain"
 import CreditCardsMain from "./components/Main components/Credit Cards/CreditCardsMain"
 import SettingsMain from "./components/Main components/Settings/SettingsMain"
 import Authentication from "./components/Main components/Sign in, Sign up/Authentication"
+import CreditCardDetails from "./components/Main components/Dashboard/Dashboard Components/CreditCards/CreditCardDetails"
 import { useLocation } from "react-router-dom"
 import api from "./api/axios"
 import { createContext, useState, useEffect } from "react"
@@ -45,6 +46,7 @@ const App = () => {
               <Route path="/accounts" element={<AccountsMain/>}/>
               <Route path="/credit-cards" element={<CreditCardsMain/>}/>
               <Route path="/settings" element={<SettingsMain/>}/>
+              <Route path="/credit-cards/:cardId" element={<CreditCardDetails/>}/>
             </Routes> 
           </UserContext.Provider>
         </main>

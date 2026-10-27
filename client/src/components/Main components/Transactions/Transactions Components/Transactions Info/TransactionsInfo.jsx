@@ -1,8 +1,10 @@
-import Transaction from "./Transaction"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useContext } from 'react'
+import { UserContext } from '../../../../../App'
 import { ArrowUpCircle, ArrowDownCircle, ChevronLeft, ChevronRight } from 'lucide-react'
 
+
 const TransactionsInfo = ({ transactionsInfo }) => {
+  const { currentUser } = useContext(UserContext)
   const [filterTransaction, setFilterTransaction] = useState('all')
   const [transactions, setTransactions] = useState(transactionsInfo)
   const [currentPage, setCurrentPage] = useState(1)
@@ -10,8 +12,8 @@ const TransactionsInfo = ({ transactionsInfo }) => {
   const itemsPerPage = 5
 
   const filteredList = transactionsInfo.filter(transaction => {
-    if (filterTransaction === 'income') return !transaction.isExpense
-    if (filterTransaction === 'expense') return transaction.isExpense
+    if (filterTransaction === 'income') return (transaction.transation_result && Number(transaction.transaction_owner) === Number(currentUser.id) ) || (!transaction.transation_result === true && Number(transaction.transaction_owner !== Number(currentUser.id)))
+    if (filterTransaction === 'expense') return !((transaction.transation_result && Number(transaction.transaction_owner) === Number(currentUser.id) ) || (!transaction.transation_result === true && Number(transaction.transaction_owner !== Number(currentUser.id))))
     return true
   })
 
@@ -86,7 +88,7 @@ const TransactionsInfo = ({ transactionsInfo }) => {
                     <td className="py-4 px-4 font-medium text-slate-800">
                       <div className="flex items-center gap-3">
                         {
-                          tx.isExpense ?
+                          (tx.transation_result && Number(tx.transaction_owner) === Number(currentUser.id) ) || (!tx.transation_result === true && Number(tx.transaction_owner !== Number(currentUser.id))) ?
                             <ArrowUpCircle className="w-6 h-6 text-slate-400 stroke-[1.5]" /> :
                             <ArrowDownCircle className="w-6 h-6 text-slate-400 stroke-[1.5]" />
                         }
@@ -95,13 +97,13 @@ const TransactionsInfo = ({ transactionsInfo }) => {
                     </td>
 
                     <td className="py-4 px-4 text-slate-600">{tx.id}</td>
-                    <td className="py-4 px-4 text-slate-600">{tx.type}</td>
+                    <td className="py-4 px-4 text-slate-600">{tx.transaction_type}</td>
                     <td className="py-4 px-4 text-slate-600">{tx.card}</td>
                     <td className="py-4 px-4 text-slate-600">{tx.date}</td>
 
-                    <td className={`py-4 px-4 font-semibold ${tx.isExpense ? 'text-rose-400' : 'text-emerald-400'
+                    <td className={`py-4 px-4 font-semibold ${(tx.transation_result && Number(tx.transaction_owner) === Number(currentUser.id) ) || (!tx.transation_result === true && Number(tx.transaction_owner !== Number(currentUser.id))) ? 'text-emerald-400' : 'text-rose-400'
                       }`}>
-                      {tx.amount}
+                      {tx.balance}
                     </td>
 
                     <td className="py-4 px-4 text-right">
@@ -113,10 +115,10 @@ const TransactionsInfo = ({ transactionsInfo }) => {
 ========================================
 Transaction ID : ${tx.id}
 Description    : ${tx.description}
-Type           : ${tx.type}
+Type           : ${tx.transaction_type}
 Card           : ${tx.card}
 Date           : ${tx.date}
-Amount         : ${tx.amount}
+Amount         : ${tx.balance}
 Status         : Completed
 ========================================
 Thank you for your business!

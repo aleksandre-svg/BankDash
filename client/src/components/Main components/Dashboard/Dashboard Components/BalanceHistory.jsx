@@ -40,29 +40,41 @@ const BalanceHistory = () => {
                     monthMap[label] = { month: label, balance: 0 }
                 }
 
-                if (sortedTx.length === 0) {
+                if (!currentUser) {
                     Object.keys(monthMap).forEach(m => {
                         monthMap[m].balance = currentBalance
                     })
                 } else {
                     let runningBalance = currentBalance
+                    
+                    const monthlyDeltas = {}
+                    Object.keys(monthMap).forEach(m => { monthlyDeltas[m] = 0 })
+
                     sortedTx.forEach(tx => {
                         const d = new Date(tx.date)
                         const label = monthNames[d.getMonth()]
                         if (monthMap[label]) {
                             const amount = parseFloat(tx.balance) || 0
-                            if ((tx.transation_result && Number(tx.transaction_owner) === Number(currentUser.id) ) || (!tx.transation_result === true && Number(tx.transaction_owner !== Number(currentUser.id)))) {
-                                runningBalance -= amount
+                            const ownerId = typeof tx.transaction_owner === 'object' ? tx.transaction_owner?.id : tx.transaction_owner
+                            const isIncome = tx.transation_result === true
+                            const isOwner = Number(ownerId) === Number(currentUser.id)
+
+                            if ((isIncome && isOwner) || (!isIncome && !isOwner)) {
+                                monthlyDeltas[label] -= amount
                             } else {
-                                runningBalance += amount
+                                monthlyDeltas[label] += amount
                             }
                         }
                     })
 
-                    let lastKnown = currentBalance
-                    Object.keys(monthMap).forEach(m => {
-                        monthMap[m].balance = lastKnown
-                    })
+                    let tempBalance = currentBalance
+                    const keys = Object.keys(monthMap)
+                    
+                    for (let i = keys.length - 1; i >= 0; i--) {
+                        const label = keys[i]
+                        monthMap[label].balance = tempBalance
+                        tempBalance += monthlyDeltas[label]
+                    }
                 }
 
                 setBalanceData(Object.values(monthMap))
@@ -74,7 +86,7 @@ const BalanceHistory = () => {
         }
 
         fetchBalanceHistory()
-    }, [])
+    }, [currentUser])
 
     if (loading) {
         return (

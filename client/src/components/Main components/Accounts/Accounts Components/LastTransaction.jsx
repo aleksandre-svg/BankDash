@@ -24,14 +24,14 @@ const LastTransaction = () => {
     console.log(transactions)
 
     return (
-        <div className='w-[800px] min-h-[235px] bg-white rounded-[25px] flex flex-col p-4 gap-2 shadow-sm border border-slate-100'>
+        <div className='w-[800px] h-[235px] bg-white rounded-[25px] flex flex-col p-4 gap-2 shadow-sm border border-slate-100'>
             {transactions?.map((item) => {
                 const isIncome = (item.transation_result && Number(item.transaction_owner) === Number(currentUser.id) ) || (!item.transation_result === true && Number(item.transaction_owner !== Number(currentUser.id)))
                 const isTransfer = item.transaction_type?.toLowerCase().includes('transfer')
                 const isService = item.transaction_type?.toLowerCase().includes('service')
 
                 return (
-                    <div key={item.id} className="flex flex-wrap items-center justify-between gap-4 py-3 hover:bg-slate-50/60 rounded-2xl transition-colors duration-150 px-5">
+                    <div key={item.id} className="flex flex-wrap items-center justify-between gap-4 py-1 hover:bg-slate-50/60 rounded-2xl transition-colors duration-150 px-5">
                         <div className="flex items-center gap-4 min-w-[240px]">
                             <div className={`w-[55px] h-[55px] rounded-[20px] flex items-center justify-center shrink-0 ${isTransfer ? 'bg-pink-50' : isService ? 'bg-blue-50' : 'bg-teal-50'}`}>
                                 {isTransfer && <User size="25px" color='#FF82AC' />}

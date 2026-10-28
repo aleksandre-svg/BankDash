@@ -22,7 +22,7 @@ const CreditCard = ({ creditCardBalance, creditCardHolder, creditCardValidDate, 
     const creditCardPANHidden = String(creditCardPAN).slice(0, 4) + ' **** **** ' + String(creditCardPAN).slice(12)
 
     return (
-        <div className={`w-full h-[235px] rounded-[25px] overflow-hidden text-white hover:shadow-md cursor-pointer hover:translate-y-[-5px] hover:scale-[1.09] hover:z-1 hover:border hover:border-[3px] duration-100`} style={creditCardStyle} onClick={() => navigate(`/credit-cards/${creditCardID}`)}>
+        <div className={`w-full h-[235px] rounded-[25px] overflow-hidden text-white hover:shadow-md cursor-pointer hover:translate-y-[-5px] hover:scale-[1.05] hover:z-1 hover:border hover:border-[3px] duration-100`} style={creditCardStyle} onClick={() => navigate(`/credit-cards/${creditCardID}`)}>
             <div className=" w-full h-[70%] flex flex-col p-[25px] justify-between border-b">
                 <div className='flex justify-between items-center w-full'>
                     <div className='flex flex-col translate-y-[3px]'>

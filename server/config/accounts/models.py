@@ -12,3 +12,5 @@ class User(AbstractUser):
     prefered_currency = models.CharField(max_length=10, default="USD")
     prefered_timezone = models.CharField(max_length=50, default="UTC")
     profile_picture = models.ImageField(upload_to='users/profile_pictures/', null=True, blank=True)
+    is_email_verified = models.BooleanField(default=False)
+    verification_code = models.CharField(max_length=6, blank=True, null=True)

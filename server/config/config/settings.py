@@ -138,6 +138,9 @@ STORAGES = {
     },
 }
 
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'stoilet385@gmail.com'
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.1/topics/i18n/

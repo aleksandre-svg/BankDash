@@ -17,8 +17,11 @@ const LoginTab = () => {
         e.preventDefault()
 
         try {
-            await api.post('login/', loginData)
-            location.replace('/dashboard')
+            const response = await api.post('login/', loginData)
+            if (response.status === 200){
+                const response = await api.post('login/', loginData)
+                location.replace('/verification')
+            }
         } catch (e){
             console.log(e || "failed")
         }

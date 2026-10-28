@@ -134,89 +134,25 @@ const EditProfileTab = () => {
     )
 }
 
-const PreferencesTab = () => {
-    const { currentUser } = useContext(UserContext)
-    const [preferences, setPreferences] = useState({
-        currency: "",
-        timeZone: ""
+const SecurityTab = () => {
+    const { currentUser, setCurrentUser } = useContext(UserContext)
+
+    const [securityData, setSecurityData] = useState({
+        twoFactorAuth: currentUser?.two_factor_authentication || false,
+        currentPassword: "",
+        newPassword: ""
     })
+    
     const [success, setSuccess] = useState('')
     const [error, setError] = useState('')
 
     useEffect(() => {
         if (currentUser) {
-            setPreferences({
-                currency: currentUser.prefered_currency || "",
-                timeZone: currentUser.prefered_timezone || ""
-            })
+            setSecurityData(prev => ({
+                ...prev,
+                twoFactorAuth: currentUser.two_factor_authentication || false
+            }))
         }
-    }, [currentUser])
-
-    const handleSubmit = async (e) => {
-        e.preventDefault()
-        setSuccess('')
-        setError('')
-
-        try {
-            await api.patch('users/me/', {
-                prefered_currency: preferences.currency,
-                prefered_timezone: preferences.timeZone
-            })
-            setSuccess('Preferences updated successfully!')
-        } catch (err) {
-            setError(JSON.stringify(err.response?.data || "Update failed"))
-        }
-    }
-
-    return (
-        <form className="flex flex-col gap-8" onSubmit={handleSubmit}>
-            {success && <p className="text-green-600 text-sm">{success}</p>}
-            {error && <p className="text-red-600 text-sm">{error}</p>}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                <div className="flex flex-col gap-2">
-                    <label className="text-[#232323] text-sm font-normal">Currency</label>
-                    <div className="relative">
-                        <input type="text" value={preferences.currency} onChange={(e) => setPreferences({...preferences, currency: e.target.value})} className="w-full h-12 px-4 pr-10 rounded-2xl border border-slate-200/80 text-[#718EBF] text-sm focus:outline-none focus:border-[#1814F3] transition-colors bg-white" />
-                    </div>
-                </div>
-                <div className="flex flex-col gap-2">
-                    <label className="text-[#232323] text-sm font-normal">Time Zone</label>
-                    <div className="relative">
-                        <input type="text" value={preferences.timeZone} onChange={(e) => setPreferences({...preferences, timeZone: e.target.value})} className="w-full h-12 px-4 pr-10 rounded-2xl border border-slate-200/80 text-[#718EBF] text-sm focus:outline-none focus:border-[#1814F3] transition-colors bg-white" />
-                    </div>
-                </div>
-            </div>
-
-            <div className="flex justify-end pt-4">
-                <button type="submit" className="w-full sm:w-auto px-12 h-12 bg-[#1814F3] hover:bg-blue-700 text-white font-medium text-sm rounded-2xl transition-colors duration-150 shadow-sm active:scale-95">
-                    Save
-                </button>
-            </div>
-        </form>
-    )
-}
-
-const SecurityTab = () => {
-    const { currentUser } = useContext(UserContext)
-
-    const [securityData, setSecurityData] = useState({
-        twoFactorAuth: false,
-        currentPassword: "",
-        newPassword: ""
-    })
-    const [success, setSuccess] = useState('')
-    const [error, setError] = useState('')
-
-    useEffect(() => {
-        if (!currentUser) {
-            return
-        }
-
-        setSecurityData({
-            twoFactorAuth: currentUser.two_factor_authentication,
-            currentPassword: "",
-            newPassword: ""
-        })
     }, [currentUser])
 
     const toggleTwoFactor = () => {
@@ -234,9 +170,11 @@ const SecurityTab = () => {
         setError('')
 
         try {
-            await api.patch('users/me/', {
+            const response = await api.patch('users/me/', {
                 two_factor_authentication: securityData.twoFactorAuth
             })
+
+            setCurrentUser(response.data)
 
             if (securityData.currentPassword && securityData.newPassword) {
                 await api.post('/change-password/', {
@@ -287,21 +225,12 @@ const SecurityTab = () => {
     )
 }
 
+
 const UserSettingsContainer = () => {
-    const [users, setUsers] = useState([])
     const [activeTab, setActiveTab] = useState("Edit Profile")
 
-    useEffect(() => {
-        api.get('users/')
-            .then(response => {
-                setUsers(response.data)
-            })
-            .catch(err => {
-                console.log(err)
-            })
-    }, [])
 
-    const tabs = ["Edit Profile", "Preferences", "Security"]
+    const tabs = ["Edit Profile", "Security"]
 
     return (
         <div className="w-[95%] bg-white rounded-[28px] p-6 sm:p-8 shadow-sm border border-slate-100/80 font-sans m-auto mt-[30px]">
@@ -320,7 +249,6 @@ const UserSettingsContainer = () => {
 
             <div className="mb-8">
                 {activeTab === "Edit Profile" && <EditProfileTab />}
-                {activeTab === "Preferences" && <PreferencesTab />}
                 {activeTab === "Security" && <SecurityTab />}
             </div>
         </div>

@@ -1,7 +1,8 @@
+import random
 from rest_framework import viewsets
 from django.contrib.auth import get_user_model
 from .serializers import UserSerializer
-from rest_framework.decorators import action
+from rest_framework.decorators import action, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth import authenticate, login, logout
@@ -10,6 +11,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from cards.models import Card
 from cards.serializers import CardSerializer
+from django.core.mail import send_mail
+from rest_framework.permissions import IsAuthenticated, AllowAny
+
 
 User = get_user_model()
 
@@ -91,3 +95,42 @@ class ChangePasswordView(APIView):
         login(request, user)
 
         return Response({'detail': 'Password changed successfully.'}, status=status.HTTP_200_OK)
+    
+# views.py
+import random
+from django.core.mail import send_mail
+from rest_framework import status
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.response import Response
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def send_verification_code(request):
+    user = request.user
+    code = f"{random.randint(100000, 999999)}"
+    user.verification_code = code
+    user.save()
+
+    send_mail(
+        'Verify Your Email - BankDash',
+        f'Your verification code is: {code}',
+        'noreply@bankdash.com',
+        [user.email],
+        fail_silently=False,
+    )
+    return Response({"detail": "Verification code sent successfully."}, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def verify_email(request):
+    user = request.user
+    code = request.data.get('code')
+
+    if user.verification_code and user.verification_code == code:
+        user.is_email_verified = True
+        user.verification_code = None
+        user.save()
+        return Response({"detail": "Email verified successfully."}, status=status.HTTP_200_OK)
+    
+    return Response({"detail": "Invalid verification code."}, status=status.HTTP_400_BAD_REQUEST)

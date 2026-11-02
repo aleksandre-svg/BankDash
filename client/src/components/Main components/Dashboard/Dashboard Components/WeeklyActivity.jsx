@@ -75,7 +75,7 @@ const WeeklyActivity = () => {
         }
 
         return (
-            <div className="bg-white rounded-3xl p-6 h-[355px] w-full translate-y-[2px] shadow-sm border border-slate-100">
+            <div className="bg-white rounded-3xl p-6 h-[312px] w-full translate-y-[2px] shadow-sm border border-slate-100">
                 <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={weeklyActivityData} barGap={12}>
                         <CartesianGrid stroke="#EDF1F7" vertical={false} />

@@ -8,6 +8,12 @@ django = "*"
 djangorestframework = "*"
 django-cors-headers = "*"
 pillow = "*"
+django-cloudinary-storage = "*"
+cloudinary = "*"
+gunicorn = "*"
+dj-database-url = "*"
+psycopg2-binary = "*"
+whitenoise = "*"
 
 [dev-packages]
 

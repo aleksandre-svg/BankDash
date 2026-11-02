@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useContext, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { UserContext } from '../../../App'
 import api from '../../../api/axios'
 
 const Verification = () => {
@@ -7,18 +8,26 @@ const Verification = () => {
     const [error, setError] = useState('')
     const [message, setMessage] = useState('')
     const [loading, setLoading] = useState(false)
+    const [sendingCode, setSendingCode] = useState(false)
+    
     const navigate = useNavigate()
+    const { currentUser } = useContext(UserContext)
 
-    const handleSendCode = async () => {
+    console.log(currentUser)
+
+    const handleSendCode = useCallback(async () => {
         setError('')
         setMessage('')
+        setSendingCode(true)
         try {
             await api.post('auth/send-verification/')
             setMessage('Verification code sent to your email!')
         } catch (err) {
             setError(err.response?.data?.detail || 'Failed to send verification code.')
+        } finally {
+            setSendingCode(false)
         }
-    }
+    }, [])
 
     const handleVerify = async (e) => {
         e.preventDefault()
@@ -27,14 +36,18 @@ const Verification = () => {
         setLoading(true)
 
         try {
-            await api.post('auth/verify-2fa/', { code })
-            navigate('/dashboard')
+            await api.post('auth/verify-email/', { code })
         } catch (err) {
             setError(err.response?.data?.detail || 'Invalid verification code. Try again.')
         } finally {
             setLoading(false)
+            navigate('/dashboard')
         }
     }
+
+    const handleCodeChange = useCallback((e) => {
+        setCode(e.target.value.replace(/\D/g, ''))
+    }, [])
 
     return (
         <div className="min-h-screen w-full bg-[#F5F7FA] flex items-center justify-center p-6">
@@ -61,9 +74,10 @@ const Verification = () => {
                 <button 
                     type="button"
                     onClick={handleSendCode}
-                    className="w-full h-[50px] bg-[#E8EEFF] text-[#2563EB] hover:bg-[#DBE5FF] transition-colors rounded-2xl text-sm font-semibold flex items-center justify-center gap-2"
+                    disabled={sendingCode}
+                    className="w-full h-[50px] bg-[#E8EEFF] text-[#2563EB] hover:bg-[#DBE5FF] disabled:opacity-50 transition-colors rounded-2xl text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer"
                 >
-                    Send 6-digit code to my email
+                    {sendingCode ? 'Sending Code...' : 'Send 6-digit code to my email'}
                 </button>
 
                 <form onSubmit={handleVerify} className="flex flex-col gap-5">
@@ -73,10 +87,10 @@ const Verification = () => {
                         </label>
                         <input 
                             type="text" 
-                            maxLength="6"
+                            maxLength={6}
                             placeholder="------"
                             value={code}
-                            onChange={(e) => setCode(e.target.value)}
+                            onChange={handleCodeChange}
                             className="h-[55px] px-4 rounded-2xl bg-[#F5F7FA] border border-[#E6EFF5] text-center text-2xl font-bold tracking-[0.5em] text-[#343C6A] outline-none focus:border-[#2563EB] transition-colors placeholder:text-slate-300"
                         />
                     </div>
@@ -84,7 +98,7 @@ const Verification = () => {
                     <button 
                         type="submit"
                         disabled={loading || code.length < 6}
-                        className="w-full h-[55px] bg-[#1814F3] hover:bg-blue-700 disabled:opacity-50 text-white font-medium rounded-2xl transition-all shadow-sm active:scale-95 flex items-center justify-center text-base"
+                        className="w-full h-[55px] bg-[#1814F3] hover:bg-blue-700 disabled:opacity-50 text-white font-medium rounded-2xl transition-all shadow-sm active:scale-95 flex items-center justify-center text-base cursor-pointer"
                     >
                         {loading ? 'Verifying...' : 'Verify & Proceed'}
                     </button>
@@ -94,7 +108,7 @@ const Verification = () => {
                     <button 
                         type="button"
                         onClick={() => navigate('/')}
-                        className="text-xs text-[#718EBF] hover:text-[#343C6A] font-medium transition-colors"
+                        className="text-xs text-[#718EBF] hover:text-[#343C6A] font-medium transition-colors cursor-pointer"
                     >
                         Back to Login
                     </button>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext, useMemo, useCallback } from 'react'
 import {
     ResponsiveContainer,
     BarChart,
@@ -8,7 +8,8 @@ import {
 } from 'recharts'
 import api from '../../../../api/axios'
 import { UserContext } from '../../../../App'
-import { useContext } from 'react'
+
+const DAYS_ORDER = ['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri']
 
 const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
@@ -38,14 +39,21 @@ const ExpenseOverview = () => {
     const [totalIncome, setTotalIncome] = useState(0)
     const [loading, setLoading] = useState(true)
 
+    const currentUserId = Number(currentUser?.id)
+
+    const isIncomeTx = useCallback((tx) => {
+        const isOwner = Number(tx.transaction_owner) === currentUserId
+        return (tx.transation_result && isOwner) || (!tx.transation_result && !isOwner)
+    }, [currentUserId])
+
     useEffect(() => {
+        let isMounted = true
+
         const fetchOverviewData = async () => {
             try {
-                const response = await api.get('transactions/')
-                const transactions = response.data
+                const { data: transactions } = await api.get('transactions/')
 
-                const daysOrder = ['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri']
-                const aggregated = daysOrder.reduce((acc, day) => {
+                const aggregated = DAYS_ORDER.reduce((acc, day) => {
                     acc[day] = { day, Expense: 0, Income: 0 }
                     return acc
                 }, {})
@@ -59,7 +67,7 @@ const ExpenseOverview = () => {
                     const amount = Math.abs(parseFloat(tx.balance) || 0)
 
                     if (aggregated[dayName]) {
-                        if ((tx.transation_result && Number(tx.transaction_owner) === Number(currentUser.id) ) || (!tx.transation_result === true && Number(tx.transaction_owner !== Number(currentUser.id)))) {
+                        if (isIncomeTx(tx)) {
                             aggregated[dayName].Income += amount
                             incSum += amount
                         } else {
@@ -69,87 +77,94 @@ const ExpenseOverview = () => {
                     }
                 })
 
-                setData(daysOrder.map(day => aggregated[day]))
-                setTotalExpense(expSum)
-                setTotalIncome(incSum)
+                if (isMounted) {
+                    setData(DAYS_ORDER.map(day => aggregated[day]))
+                    setTotalExpense(expSum)
+                    setTotalIncome(incSum)
+                }
             } catch (err) {
                 console.error("Failed to fetch expense overview data", err)
             } finally {
-                setLoading(false)
+                if (isMounted) {
+                    setLoading(false)
+                }
             }
         }
 
         fetchOverviewData()
-    }, [])
+        return () => { isMounted = false }
+    }, [isIncomeTx])
 
-    if (loading) {
+    const chartContent = useMemo(() => {
+        if (loading) {
+            return (
+                <div className="flex items-center justify-center font-sans bg-white rounded-3xl p-8 h-[350px] shadow-sm">
+                    <p className="text-sm text-[#718EBF]">Loading overview...</p>
+                </div>
+            )
+        }
+
         return (
-            <div className="flex items-center justify-center font-sans bg-white rounded-3xl p-8 h-[350px] shadow-sm">
-                <p className="text-sm text-[#718EBF]">Loading overview...</p>
+            <div className="flex items-center justify-center font-sans">
+                <div className="w-full bg-white rounded-3xl p-6 sm:p-8 shadow-sm">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+                        <div className="text-[#718EBF] text-sm sm:text-base font-normal leading-relaxed">
+                            <span className="text-[#232323] font-bold text-base sm:text-lg">${totalExpense.toLocaleString()}</span>{' '}
+                            <span>Expense</span>
+                            <span className="mx-1 font-normal">&amp;</span>
+                            <span className="text-[#232323] font-bold text-base sm:text-lg">${totalIncome.toLocaleString()}</span>{' '}
+                            <span>Income in this Week</span>
+                        </div>
+
+                        <div className="flex items-center gap-6">
+                            <div className="flex items-center gap-2.5">
+                                <span className="w-3.5 h-3.5 rounded-full bg-[#1E3AEC] inline-block shrink-0" />
+                                <span className="text-[#718EBF] text-sm font-medium">Expense</span>
+                            </div>
+                            <div className="flex items-center gap-2.5">
+                                <span className="w-3.5 h-3.5 rounded-full bg-[#F59100] inline-block shrink-0" />
+                                <span className="text-[#718EBF] text-sm font-medium">Income</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="h-[280px] sm:h-[320px]">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <BarChart
+                                data={data}
+                                margin={{ top: 10, right: 10, left: 10, bottom: 0 }}
+                                barGap={8}
+                                barCategoryGap="20%"
+                            >
+                                <XAxis
+                                    dataKey="day"
+                                    axisLine={false}
+                                    tickLine={false}
+                                    tick={{ fill: '#8BA3CB', fontSize: 13, fontWeight: 500 }}
+                                    dy={12}
+                                />
+                                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'transparent' }} />
+                                <Bar
+                                    dataKey="Expense"
+                                    fill="#1E3AEC"
+                                    radius={[12, 12, 12, 12]}
+                                    maxBarSize={18}
+                                />
+                                <Bar
+                                    dataKey="Income"
+                                    fill="#F59100"
+                                    radius={[12, 12, 12, 12]}
+                                    maxBarSize={18}
+                                />
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </div>
+                </div>
             </div>
         )
-    }
+    }, [loading, data, totalExpense, totalIncome])
 
-    return (
-        <div className="flex items-center justify-center font-sans">
-            <div className="w-full bg-white rounded-3xl p-6 sm:p-8 shadow-sm">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-                    <div className="text-[#718EBF] text-sm sm:text-base font-normal leading-relaxed">
-                        <span className="text-[#232323] font-bold text-base sm:text-lg">${totalExpense.toLocaleString()}</span>{' '}
-                        <span>Expense</span>
-                        <span className="mx-1 font-normal">&amp;</span>
-                        <span className="text-[#232323] font-bold text-base sm:text-lg">${totalIncome.toLocaleString()}</span>{' '}
-                        <span>Income in this Week</span>
-                    </div>
-
-                    <div className="flex items-center gap-6">
-                        <div className="flex items-center gap-2.5">
-                            <span className="w-3.5 h-3.5 rounded-full bg-[#1E3AEC] inline-block shrink-0" />
-                            <span className="text-[#718EBF] text-sm font-medium">Expense</span>
-                        </div>
-                        <div className="flex items-center gap-2.5">
-                            <span className="w-3.5 h-3.5 rounded-full bg-[#F59100] inline-block shrink-0" />
-                            <span className="text-[#718EBF] text-sm font-medium">Income</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="h-[280px] sm:h-[320px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                        <BarChart
-                            data={data}
-                            margin={{ top: 10, right: 10, left: 10, bottom: 0 }}
-                            barGap={8}
-                            barCategoryGap="20%"
-                        >
-                            <XAxis
-                                dataKey="day"
-                                axisLine={false}
-                                tickLine={false}
-                                tick={{ fill: '#8BA3CB', fontSize: 13, fontWeight: 500 }}
-                                dy={12}
-                            />
-                            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'transparent' }} />
-                            
-                            <Bar
-                                dataKey="Expense"
-                                fill="#1E3AEC"
-                                radius={[12, 12, 12, 12]}
-                                maxBarSize={18}
-                            />
-                            
-                            <Bar
-                                dataKey="Income"
-                                fill="#F59100"
-                                radius={[12, 12, 12, 12]}
-                                maxBarSize={18}
-                            />
-                        </BarChart>
-                    </ResponsiveContainer>
-                </div>
-            </div>
-        </div>
-    )
+    return chartContent
 }
 
 export default ExpenseOverview

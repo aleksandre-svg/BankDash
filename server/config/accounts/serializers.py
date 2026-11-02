@@ -9,7 +9,7 @@ class UserSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'username', 'email', 'first_name', 'last_name', 'profile_picture',
             'date_of_birth', 'present_address', 'permanent_address',
-            'city', 'country', 'postal_code', 'two_factor_authentication',
+            'city', 'country', 'postal_code', 'is_email_verified', 'two_factor_authentication',
             'prefered_currency', 'prefered_timezone', 'password'
         ]
         extra_kwargs = {

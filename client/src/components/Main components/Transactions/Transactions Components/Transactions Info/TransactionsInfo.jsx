@@ -1,115 +1,42 @@
-import { useState, useEffect, useContext } from 'react'
+import { useState, useEffect, useContext, useMemo, useCallback } from 'react'
 import { UserContext } from '../../../../../App'
 import { ArrowUpCircle, ArrowDownCircle, ChevronLeft, ChevronRight } from 'lucide-react'
 
+const ITEMS_PER_PAGE = 5
 
-const TransactionsInfo = ({ transactionsInfo }) => {
+const TransactionsInfo = ({ transactionsInfo = [] }) => {
   const { currentUser } = useContext(UserContext)
   const [filterTransaction, setFilterTransaction] = useState('all')
-  const [transactions, setTransactions] = useState(transactionsInfo)
   const [currentPage, setCurrentPage] = useState(1)
 
-  const itemsPerPage = 5
+  const currentUserId = Number(currentUser?.id)
 
-  const filteredList = transactionsInfo.filter(transaction => {
-    if (filterTransaction === 'income') return (transaction.transation_result && Number(transaction.transaction_owner) === Number(currentUser.id) ) || (!transaction.transation_result === true && Number(transaction.transaction_owner !== Number(currentUser.id)))
-    if (filterTransaction === 'expense') return !((transaction.transation_result && Number(transaction.transaction_owner) === Number(currentUser.id) ) || (!transaction.transation_result === true && Number(transaction.transaction_owner !== Number(currentUser.id))))
-    return true
-  })
+  const isIncome = useCallback((tx) => {
+    const isOwner = Number(tx.transaction_owner) === currentUserId
+    return (tx.transation_result && isOwner) || (!tx.transation_result && !isOwner)
+  }, [currentUserId])
 
-  const totalPages = Math.max(1, Math.ceil(filteredList.length / itemsPerPage))
-  const array = []
-  for (let i = 1; i <= totalPages; i++) {
-    array.push(i)
-  }
+  const filteredList = useMemo(() => {
+    return transactionsInfo.filter((tx) => {
+      if (filterTransaction === 'income') return isIncome(tx)
+      if (filterTransaction === 'expense') return !isIncome(tx)
+      return true
+    })
+  }, [transactionsInfo, filterTransaction, isIncome])
+
+  const totalPages = Math.max(1, Math.ceil(filteredList.length / ITEMS_PER_PAGE))
 
   useEffect(() => {
     setCurrentPage(1)
   }, [filterTransaction])
 
-  useEffect(() => {
-    const indexOfLastItem = currentPage * itemsPerPage
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage
-    setTransactions(filteredList.slice(indexOfFirstItem, indexOfLastItem))
-  }, [filterTransaction, currentPage, transactionsInfo])
+  const paginatedTransactions = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE
+    return filteredList.slice(start, start + ITEMS_PER_PAGE)
+  }, [filteredList, currentPage])
 
-  return (
-    <>
-      <div>
-        <div className="flex items-center gap-[60px] border-b border-[#EBEEF2]">
-          <button
-            className={`pb-[12px] font-semibold text-[16px] border-b-[3px] px-[10px] transition-all ${filterTransaction === 'all'
-                ? "text-[#1814F3] border-[#1814F3]"
-                : "text-[#718EBF] border-transparent hover:text-[#1814F3]"
-              }`}
-            onClick={() => setFilterTransaction('all')}
-          >
-            All Transactions
-          </button>
-          <button
-            className={`pb-[12px] font-semibold text-[16px] px-[10px] border-b-[3px] transition-all ${filterTransaction === 'income'
-                ? "text-[#1814F3] border-[#1814F3]"
-                : "text-[#718EBF] border-transparent hover:text-[#1814F3]"
-              }`}
-            onClick={() => setFilterTransaction('income')}
-          >
-            Income
-          </button>
-          <button
-            className={`pb-[12px] font-semibold text-[16px] px-[10px] border-b-[3px] transition-all ${filterTransaction === 'expense'
-                ? "text-[#1814F3] border-[#1814F3]"
-                : "text-[#718EBF] border-transparent hover:text-[#1814F3]"
-              }`}
-            onClick={() => setFilterTransaction('expense')}
-          >
-            Expense
-          </button>
-        </div>
-
-        <hr className="text-[#EBEEF2] pb-[25px]" />
-
-        <div className="w-full p-2 bg-white rounded-2xl shadow-sm border border-slate-100">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="border-b border-slate-100 text-slate-400 text-sm font-medium">
-                  <th className="py-3 px-4 font-[500] text-[16px]">Description</th>
-                  <th className="py-3 px-4 font-[500] text-[16px]">Transaction ID</th>
-                  <th className="py-3 px-4 font-[500] text-[16px]">Type</th>
-                  <th className="py-3 px-4 font-[500] text-[16px]">Card</th>
-                  <th className="py-3 px-4 font-[500] text-[16px]">Date</th>
-                  <th className="py-3 px-4 font-[500] text-[16px]">Amount</th>
-                  <th className="py-3 px-4 font-[500] text-[16px] text-right">Receipt</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
-                {transactions?.map((tx, index) => (
-                  <tr key={index} className="hover:bg-slate-50/50 transition-colors">
-                    <td className="py-4 px-4 font-medium text-slate-800">
-                      <div className="flex items-center gap-3">
-                        {
-                          (tx.transation_result && Number(tx.transaction_owner) === Number(currentUser.id) ) || (!tx.transation_result === true && Number(tx.transaction_owner !== Number(currentUser.id))) ?
-                            <ArrowUpCircle className="w-6 h-6 text-slate-400 stroke-[1.5]" /> :
-                            <ArrowDownCircle className="w-6 h-6 text-slate-400 stroke-[1.5]" />
-                        }
-                        <span>{tx.description}</span>
-                      </div>
-                    </td>
-
-                    <td className="py-4 px-4 text-slate-600">{tx.id}</td>
-                    <td className="py-4 px-4 text-slate-600">{tx.transaction_type}</td>
-                    <td className="py-4 px-4 text-slate-600">{tx.card}</td>
-                    <td className="py-4 px-4 text-slate-600">{tx.date}</td>
-
-                    <td className={`py-4 px-4 font-semibold ${(tx.transation_result && Number(tx.transaction_owner) === Number(currentUser.id) ) || (!tx.transation_result === true && Number(tx.transaction_owner !== Number(currentUser.id))) ? 'text-emerald-400' : 'text-rose-400'
-                      }`}>
-                      {tx.balance}
-                    </td>
-
-                    <td className="py-4 px-4 text-right">
-                      <button
-                        onClick={() => {
-                          const receiptContent = `
+  const handleDownloadReceipt = useCallback((tx) => {
+    const receiptContent = `
 ========================================
         TRANSACTION RECEIPT
 ========================================
@@ -122,65 +49,173 @@ Amount         : ${tx.balance}
 Status         : Completed
 ========================================
 Thank you for your business!
-`
-                          const blob = new Blob([receiptContent.trim()], { type: 'text/plain;charset=utf-8;' })
-                          const url = URL.createObjectURL(blob)
-                          const link = document.createElement('a')
-                          link.href = url
-                          link.setAttribute('download', `receipt-${tx.id.replace('#', '')}.txt`)
-                          document.body.appendChild(link)
-                          link.click()
-                          document.body.removeChild(link)
-                          URL.revokeObjectURL(url)
-                        }}
-                        className="px-4 py-1.5 text-xs font-medium text-blue-600 border border-blue-500 rounded-full hover:bg-blue-50 transition-colors"
-                      >
-                        Download
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+`.trim()
 
-        <div className="flex items-center justify-end gap-3 text-sm font-medium pt-5">
-          <button
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-            className="flex items-center gap-1 text-[#1814F3] font-[600] disabled:cursor-not-allowed transition-colors px-2 py-1"
-          >
-            <ChevronLeft className="w-4 h-4 stroke-[2.5]" />
-            <span>Previous</span>
-          </button>
+    const blob = new Blob([receiptContent], { type: 'text/plain;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `receipt-${String(tx.id).replace('#', '')}.txt`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+  }, [])
 
-          <div className="flex items-center gap-2">
-            {array.map((page) => (
-              <button
-                key={page}
-                onClick={() => setCurrentPage(page)}
-                className={`w-9 h-9 flex items-center justify-center rounded-xl text-sm transition-all ${currentPage === page
-                  ? 'bg-[#1814F3] text-white font-semibold shadow-sm'
-                  : 'text-[#1814F3]'
-                  }`}
-              >
-                {page}
-              </button>
-            ))}
-          </div>
+  const handleFilterChange = useCallback((type) => {
+    setFilterTransaction(type)
+  }, [])
 
-          <button
-            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-            disabled={currentPage === totalPages}
-            className="flex items-center gap-1 text-[#1814F3] font-[600] disabled:cursor-not-allowed transition-colors px-2 py-1"
-          >
-            <span>Next</span>
-            <ChevronRight className="w-4 h-4 stroke-[2.5]" />
-          </button>
+  const handlePrevPage = useCallback(() => {
+    setCurrentPage((prev) => Math.max(prev - 1, 1))
+  }, [])
+
+  const handleNextPage = useCallback(() => {
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+  }, [totalPages])
+
+  const handlePageSelect = useCallback((page) => {
+    setCurrentPage(page)
+  }, [])
+
+  const renderFilterButton = useCallback((type, label) => (
+    <button
+      key={type}
+      type="button"
+      className={`pb-[12px] font-semibold text-[16px] px-[10px] border-b-[3px] transition-all cursor-pointer ${
+        filterTransaction === type
+          ? "text-[#1814F3] border-[#1814F3]"
+          : "text-[#718EBF] border-transparent hover:text-[#1814F3]"
+      }`}
+      onClick={() => handleFilterChange(type)}
+    >
+      {label}
+    </button>
+  ), [filterTransaction, handleFilterChange])
+
+  const tableBodyContent = useMemo(() => {
+    if (paginatedTransactions.length === 0) {
+      return (
+        <tr>
+          <td colSpan="7" className="py-8 text-center text-[#718EBF] text-sm">
+            No transactions found.
+          </td>
+        </tr>
+      )
+    }
+
+    return paginatedTransactions.map((tx, index) => {
+      const income = isIncome(tx)
+      const formattedBalance = Math.abs(parseFloat(tx.balance) || 0).toLocaleString()
+
+      return (
+        <tr key={tx.id || index} className="hover:bg-slate-50/50 transition-colors">
+          <td className="py-4 px-4 font-medium text-slate-800">
+            <div className="flex items-center gap-3">
+              {income ? (
+                <ArrowUpCircle className="w-6 h-6 text-emerald-500 stroke-[1.5]" />
+              ) : (
+                <ArrowDownCircle className="w-6 h-6 text-rose-500 stroke-[1.5]" />
+              )}
+              <span>{tx.description || 'Transaction'}</span>
+            </div>
+          </td>
+
+          <td className="py-4 px-4 text-slate-600 font-mono">{tx.id}</td>
+          <td className="py-4 px-4 text-slate-600 capitalize">{tx.transaction_type}</td>
+          <td className="py-4 px-4 text-slate-600">ID: {tx.card}</td>
+          <td className="py-4 px-4 text-slate-600">
+            {tx.date ? new Date(tx.date).toLocaleDateString() : 'N/A'}
+          </td>
+
+          <td className={`py-4 px-4 font-semibold ${income ? 'text-emerald-500' : 'text-rose-500'}`}>
+            {income ? '+' : '-'}${formattedBalance}
+          </td>
+
+          <td className="py-4 px-4 text-right">
+            <button
+              type="button"
+              onClick={() => handleDownloadReceipt(tx)}
+              className="px-4 py-1.5 text-xs font-medium text-blue-600 border border-blue-500 rounded-full hover:bg-blue-50 transition-colors cursor-pointer"
+            >
+              Download
+            </button>
+          </td>
+        </tr>
+      )
+    })
+  }, [paginatedTransactions, isIncome, handleDownloadReceipt])
+
+  return (
+    <div>
+      <div className="flex items-center gap-[60px] border-b border-[#EBEEF2]">
+        {renderFilterButton('all', 'All Transactions')}
+        {renderFilterButton('income', 'Income')}
+        {renderFilterButton('expense', 'Expense')}
+      </div>
+
+      <div className="text-[#EBEEF2] pb-[25px]" />
+
+      <div className="w-full p-2 bg-white rounded-2xl shadow-sm border border-slate-100">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="border-b border-slate-100 text-slate-400 text-sm font-medium">
+                <th className="py-3 px-4 font-medium text-[16px]">Description</th>
+                <th className="py-3 px-4 font-medium text-[16px]">Transaction ID</th>
+                <th className="py-3 px-4 font-medium text-[16px]">Type</th>
+                <th className="py-3 px-4 font-medium text-[16px]">Card</th>
+                <th className="py-3 px-4 font-medium text-[16px]">Date</th>
+                <th className="py-3 px-4 font-medium text-[16px]">Amount</th>
+                <th className="py-3 px-4 font-medium text-[16px] text-right">Receipt</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
+              {tableBodyContent}
+            </tbody>
+          </table>
         </div>
       </div>
-    </>
+
+      <div className="flex items-center justify-end gap-3 text-sm font-medium pt-5">
+        <button
+          type="button"
+          onClick={handlePrevPage}
+          disabled={currentPage === 1}
+          className="flex items-center gap-1 text-[#1814F3] font-semibold disabled:cursor-not-allowed disabled:opacity-50 transition-colors px-2 py-1 cursor-pointer"
+        >
+          <ChevronLeft className="w-4 h-4 stroke-[2.5]" />
+          <span>Previous</span>
+        </button>
+
+        <div className="flex items-center gap-2">
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+            <button
+              key={page}
+              type="button"
+              onClick={() => handlePageSelect(page)}
+              className={`w-9 h-9 flex items-center justify-center rounded-xl text-sm transition-all cursor-pointer ${
+                currentPage === page
+                  ? 'bg-[#1814F3] text-white font-semibold shadow-sm'
+                  : 'text-[#1814F3]'
+              }`}
+            >
+              {page}
+            </button>
+          ))}
+        </div>
+
+        <button
+          type="button"
+          onClick={handleNextPage}
+          disabled={currentPage === totalPages}
+          className="flex items-center gap-1 text-[#1814F3] font-semibold disabled:cursor-not-allowed disabled:opacity-50 transition-colors px-2 py-1 cursor-pointer"
+        >
+          <span>Next</span>
+          <ChevronRight className="w-4 h-4 stroke-[2.5]" />
+        </button>
+      </div>
+    </div>
   )
 }
 

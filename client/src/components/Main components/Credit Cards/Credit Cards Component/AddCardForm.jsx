@@ -1,13 +1,13 @@
 import { useState } from "react"
 import {
-    CreditCard,
+    CreditCard as CreditCardIcon,
     User,
     Calendar,
     Hash,
-    ChevronDown,
     PlusCircle,
     ShieldCheck,
     Info,
+    Building2,
 } from "lucide-react"
 import api from "../../../../api/axios"
 
@@ -18,14 +18,16 @@ export default function AddCardForm() {
     const [expirationDate, setExpirationDate] = useState("2027-02-22")
     const [CVC, setCVC] = useState("***")
     const [bank, setBank] = useState('ABM')
-    // balance = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
-    // card_holder = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    // valid_date = models.DateField()
-    // card_number = models.CharField(max_length=16, unique=True)
-    // bank = models.CharField(max_length=50)
-    // cvc = models.CharField(max_length=4)
-    const handleSubmit =  async (e) => {
+    const [loading, setLoading] = useState(false)
+    const [success, setSuccess] = useState('')
+    const [error, setError] = useState('')
+
+    const handleSubmit = async (e) => {
         e.preventDefault()
+        setSuccess('')
+        setError('')
+        setLoading(true)
+
         try {
             const data = {
                 balance: 0,
@@ -34,15 +36,31 @@ export default function AddCardForm() {
                 cvc: CVC,
                 bank: bank
             }
-            console.log(data)
-            const response = await api.post('cards/', data)
-        } catch (e){
-            console.log(e)
+            await api.post('cards/', data)
+            setSuccess('Card added successfully!')
+            window.location.reload()
+        } catch (err) {
+            setError(JSON.stringify(err.response?.data || 'Failed to add card'))
+        } finally {
+            setLoading(false)
+            location.reload()
         }
     }
 
     return (
-        <div className="w-full bg-white rounded-[28px] p-6 sm:p-8 border border-slate-100/80 font-sans">
+        <div className="w-full bg-white rounded-[28px] p-6 sm:p-8 border border-slate-100/80 font-sans shadow-sm">
+            {success && (
+                <div className="mb-6 p-3 bg-emerald-50 border border-emerald-200 text-emerald-600 text-xs rounded-xl font-medium">
+                    {success}
+                </div>
+            )}
+
+            {error && (
+                <div className="mb-6 p-3 bg-rose-50 border border-rose-200 text-[#FE5C73] text-xs rounded-xl font-medium">
+                    {error}
+                </div>
+            )}
+
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8 items-stretch">
                 <div className="lg:col-span-5 bg-gradient-to-br from-[#1814F3] via-[#2A26FF] to-[#6366F1] rounded-2xl p-6 text-white flex flex-col justify-between shadow-lg shadow-indigo-100 min-h-[190px]">
                     <div className="flex justify-between items-center">
@@ -55,7 +73,7 @@ export default function AddCardForm() {
                             </p>
                         </div>
                         <div className="w-10 h-10 bg-white/10 backdrop-blur-md rounded-xl flex items-center justify-center">
-                            <CreditCard className="w-6 h-6 text-white" />
+                            <CreditCardIcon className="w-6 h-6 text-white" />
                         </div>
                     </div>
 
@@ -110,8 +128,8 @@ export default function AddCardForm() {
             <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                     <div className="flex flex-col gap-2">
-                        <label className="text-[#232323] text-sm font-semibold flex items-center gap-1.5">
-                            <span>Card Type</span>
+                        <label className="text-[#232323] text-sm font-semibold">
+                            Card Type
                         </label>
                         <div className="relative">
                             <input
@@ -119,9 +137,9 @@ export default function AddCardForm() {
                                 value={cardType}
                                 onChange={(e) => setCardType(e.target.value)}
                                 placeholder="Classic, Platinum, Gold"
-                                className="w-full h-12 pl-11 pr-4 rounded-2xl border border-slate-200 text-[#232323] placeholder-[#8BA3CB] text-sm focus:outline-none focus:border-[#1814F3] focus:ring-4 focus:ring-indigo-50 transition-all bg-white"
+                                className="w-full h-12 pl-11 pr-4 rounded-2xl border border-slate-200 text-[#343C6A] placeholder-[#8BA3CB] text-sm focus:outline-none focus:border-[#1814F3] focus:ring-4 focus:ring-indigo-50 transition-all bg-white"
                             />
-                            <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#718EBF]" />
+                            <CreditCardIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#718EBF]" />
                         </div>
                     </div>
 
@@ -135,7 +153,7 @@ export default function AddCardForm() {
                                 value={nameOnCard}
                                 onChange={(e) => setNameOnCard(e.target.value)}
                                 placeholder="e.g. John Doe"
-                                className="w-full h-12 pl-11 pr-4 rounded-2xl border border-slate-200 text-[#232323] placeholder-[#8BA3CB] text-sm focus:outline-none focus:border-[#1814F3] focus:ring-4 focus:ring-indigo-50 transition-all bg-white"
+                                className="w-full h-12 pl-11 pr-4 rounded-2xl border border-slate-200 text-[#343C6A] placeholder-[#8BA3CB] text-sm focus:outline-none focus:border-[#1814F3] focus:ring-4 focus:ring-indigo-50 transition-all bg-white"
                             />
                             <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#718EBF]" />
                         </div>
@@ -151,7 +169,7 @@ export default function AddCardForm() {
                                 value={cardNumber}
                                 onChange={(e) => setCardNumber(e.target.value)}
                                 placeholder="**** **** **** ****"
-                                className="w-full h-12 pl-11 pr-4 rounded-2xl border border-slate-200 text-[#232323] placeholder-[#8BA3CB] text-sm focus:outline-none focus:border-[#1814F3] focus:ring-4 focus:ring-indigo-50 transition-all bg-white font-mono"
+                                className="w-full h-12 pl-11 pr-4 rounded-2xl border border-slate-200 text-[#343C6A] placeholder-[#8BA3CB] text-sm focus:outline-none focus:border-[#1814F3] focus:ring-4 focus:ring-indigo-50 transition-all bg-white font-mono"
                             />
                             <Hash className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#718EBF]" />
                         </div>
@@ -167,7 +185,7 @@ export default function AddCardForm() {
                                 value={CVC}
                                 onChange={(e) => setCVC(e.target.value)}
                                 placeholder="123"
-                                className="w-full h-12 pl-11 pr-4 rounded-2xl border border-slate-200 text-[#232323] placeholder-[#8BA3CB] text-sm focus:outline-none focus:border-[#1814F3] focus:ring-4 focus:ring-indigo-50 transition-all bg-white font-mono"
+                                className="w-full h-12 pl-11 pr-4 rounded-2xl border border-slate-200 text-[#343C6A] placeholder-[#8BA3CB] text-sm focus:outline-none focus:border-[#1814F3] focus:ring-4 focus:ring-indigo-50 transition-all bg-white font-mono"
                             />
                             <Hash className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#718EBF]" />
                         </div>
@@ -179,11 +197,10 @@ export default function AddCardForm() {
                         </label>
                         <div className="relative">
                             <input
-                                type="text"
+                                type="date"
                                 value={expirationDate}
                                 onChange={(e) => setExpirationDate(e.target.value)}
-                                placeholder="25 January 2028"
-                                className="w-full h-12 pl-11 pr-10 rounded-2xl border border-slate-200 text-[#232323] placeholder-[#8BA3CB] text-sm focus:outline-none focus:border-[#1814F3] focus:ring-4 focus:ring-indigo-50 transition-all bg-white cursor-pointer"
+                                className="w-full h-12 pl-11 pr-4 rounded-2xl border border-slate-200 text-[#343C6A] text-sm focus:outline-none focus:border-[#1814F3] focus:ring-4 focus:ring-indigo-50 transition-all bg-white cursor-pointer"
                             />
                             <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#718EBF]" />
                         </div>
@@ -191,17 +208,17 @@ export default function AddCardForm() {
                     
                     <div className="flex flex-col gap-2">
                         <label className="text-[#232323] text-sm font-semibold">
-                            Bank
+                            Bank Code
                         </label>
                         <div className="relative">
                             <input
                                 type="text"
                                 value={bank}
                                 onChange={(e) => setBank(e.target.value)}
-                                placeholder="ABN"
-                                className="w-full h-12 pl-11 pr-10 rounded-2xl border border-slate-200 text-[#232323] placeholder-[#8BA3CB] text-sm focus:outline-none focus:border-[#1814F3] focus:ring-4 focus:ring-indigo-50 transition-all bg-white cursor-pointer"
+                                placeholder="ABM, BRC, DBL"
+                                className="w-full h-12 pl-11 pr-4 rounded-2xl border border-slate-200 text-[#343C6A] placeholder-[#8BA3CB] text-sm focus:outline-none focus:border-[#1814F3] focus:ring-4 focus:ring-indigo-50 transition-all bg-white"
                             />
-                            <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#718EBF]" />
+                            <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#718EBF]" />
                         </div>
                     </div>
                 </div>
@@ -209,10 +226,11 @@ export default function AddCardForm() {
                 <div className="pt-4 flex items-center justify-start gap-4">
                     <button
                         type="submit"
-                        className="flex items-center gap-2 px-8 h-12 bg-[#1814F3] hover:bg-[#120FD1] text-white font-medium text-sm rounded-2xl transition-all duration-150 shadow-md shadow-indigo-200 active:scale-95"
+                        disabled={loading}
+                        className="flex items-center gap-2 px-8 h-12 bg-[#1814F3] hover:bg-[#120FD1] disabled:opacity-50 text-white font-medium text-sm rounded-2xl transition-all duration-150 shadow-md shadow-indigo-200 active:scale-95"
                     >
                         <PlusCircle className="w-4 h-4" />
-                        <span>Add Card</span>
+                        <span>{loading ? 'Adding Card...' : 'Add Card'}</span>
                     </button>
                     <button
                         type="button"

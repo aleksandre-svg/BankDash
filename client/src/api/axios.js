@@ -15,9 +15,9 @@ function getCookie(name) {
     return cookieValue
 }
 
-const rawBaseURL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+const rawBaseURL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
-const baseURL = rawBaseURL.replace(/\/$/, '') + '/api/'
+const baseURL = rawBaseURL.replace(/\/+$/, '') + '/api';
 
 const api = axios.create({
     baseURL: baseURL,

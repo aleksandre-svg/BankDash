@@ -15,12 +15,16 @@ function getCookie(name) {
     return cookieValue
 }
 
+const rawBaseURL = import.meta.env.VITE_BACKEND_API_URL || 'http://localhost:8000'
+
+const baseURL = rawBaseURL.replace(/\/$/, '') + '/api/'
+
 const api = axios.create({
-    baseURL: import.meta.env.BACKEND_API_URL + '/api/' || 'http://localhost:8000/api/',
+    baseURL: baseURL,
     withCredentials: true,
     headers: {
-        'Content-Type': 'application/json'
-    }
+        'Content-Type': 'application/json',
+    },
 })
 
 api.interceptors.request.use((config) => {

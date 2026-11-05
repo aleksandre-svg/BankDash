@@ -13,6 +13,7 @@ from cards.serializers import CardSerializer
 from rest_framework.permissions import IsAuthenticated
 from .serializers import UserSerializer
 from django.conf import settings
+from django.middleware.csrf import get_token
 
 User = get_user_model()
 
@@ -37,7 +38,12 @@ class LoginView(APIView):
                 request.session.modified = True
                 request.session.save()
                 
+                csrf_token = get_token(request)
+                
                 serializer = UserSerializer(user)
+                
+                response_data = serializer.data
+                response_data['csrf_token'] = csrf_token
                 return Response(serializer.data, status=status.HTTP_200_OK)
                 
         except User.DoesNotExist:

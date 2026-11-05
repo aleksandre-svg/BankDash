@@ -16,28 +16,21 @@ const LoginTab = () => {
         setLoginData(prev => ({ ...prev, [name]: value }))
     }, [])
 
-const handleSubmit = async (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault()
-        setError("")
-        setLoading(true)
-
         try {
-            const response = await api.post('login/', loginData)
-            const foundUser = response.data
+            const response = await api.post('login/', loginData);
+            const foundUser = response.data;
 
             localStorage.setItem('user', JSON.stringify(foundUser))
-
-            setCurrentUser(foundUser)   
-
-            if (foundUser.two_factor_authentication) {
-                navigate('/verification')
-            } else {
-                navigate('/dashboard')
+            if (foundUser.csrf_token) {
+                localStorage.setItem('csrftoken', foundUser.csrf_token)
             }
+
+            setCurrentUser(foundUser);
+            navigate('/dashboard');
         } catch (err) {
-            setError(err.response?.data?.detail || 'Invalid email or password.')
-        } finally {
-            setLoading(false)
+            setError('Invalid email or password.');
         }
     }
 

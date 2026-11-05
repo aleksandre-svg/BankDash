@@ -27,6 +27,16 @@ const App = () => {
   const [authLoading, setAuthLoading] = useState(true)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
+  useEffect(() => {
+    api.get('get-csrf/')
+      .then(res => {
+        if (res.data.csrfToken) {
+          localStorage.setItem('csrftoken', res.data.csrfToken);
+        }
+      })
+      .catch(err => console.error("Failed to fetch CSRF token", err));
+  }, [])
+
   const isPublicRoute = useMemo(() => PUBLIC_ROUTES.includes(pathname), [pathname])
 
   const handleOpenSidebar = useCallback(() => {

@@ -19,7 +19,7 @@ api.interceptors.request.use((config) => {
             config.headers['X-CSRFToken'] = csrfToken
         }
     }
-    return config;
+    return config
 }, (error) => {
     return Promise.reject(error)
 })

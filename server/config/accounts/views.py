@@ -10,10 +10,15 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from cards.models import Card
 from cards.serializers import CardSerializer
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from .serializers import UserSerializer
 from django.conf import settings
 from django.middleware.csrf import get_token
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_csrf(request):
+    return Response({'csrfToken': get_token(request)})
 
 User = get_user_model()
 

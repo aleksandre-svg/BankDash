@@ -20,7 +20,10 @@ const PUBLIC_ROUTES = ['/', '/verification']
 
 const App = () => {
   const { pathname } = useLocation()
-  const [currentUser, setCurrentUser] = useState(null)
+  const [currentUser, setCurrentUser] = useState(() => {
+    const savedUser = localStorage.getItem('user')
+    return savedUser ? JSON.parse(savedUser) : null
+  })
   const [authLoading, setAuthLoading] = useState(true)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 

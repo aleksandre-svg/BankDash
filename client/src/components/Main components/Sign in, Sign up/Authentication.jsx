@@ -16,7 +16,7 @@ const LoginTab = () => {
         setLoginData(prev => ({ ...prev, [name]: value }))
     }, [])
 
-    const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
         e.preventDefault()
         setError("")
         setLoading(true)
@@ -25,7 +25,9 @@ const LoginTab = () => {
             const response = await api.post('login/', loginData)
             const foundUser = response.data
 
-            setCurrentUser(foundUser)
+            localStorage.setItem('user', JSON.stringify(foundUser))
+
+            setCurrentUser(foundUser)   
 
             if (foundUser.two_factor_authentication) {
                 navigate('/verification')

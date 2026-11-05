@@ -31,6 +31,7 @@ const Header = ({ pageTitle, onOpenSidebar }) => {
         } catch (err) {
             console.error("Logout failed", err)
         } finally {
+            localStorage.removeItem('user')
             window.location.replace('/')
         }
     }, [])

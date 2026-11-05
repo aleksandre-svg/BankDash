@@ -119,19 +119,20 @@ CSRF_TRUSTED_ORIGINS = [
     "https://bank-dash-by-aleksandre.vercel.app"
 ]
 
-CSRF_COOKIE_SAMESITE = 'Lax'
-CSRF_COOKIE_SECURE = False
-CSRF_COOKIE_HTTPONLY = False
-
 CORS_ALLOW_CREDENTIALS = True
+
+SESSION_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_HTTPONLY = True
+
+CSRF_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_HTTPONLY = False  
+
 SESSION_COOKIE_DOMAIN = None
 CSRF_COOKIE_DOMAIN = None
-SESSION_COOKIE_SECURE = False
 
 
-
-# Password validation
-# https://docs.djangoproject.com/en/6.1/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {

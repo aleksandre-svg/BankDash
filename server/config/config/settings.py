@@ -27,7 +27,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config('SECRET_KEY', default='unsafe-default-key')
 
-DEBUG = True
+DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.vercel.app', '.onrender.com']
 
@@ -90,11 +90,14 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 
 # Explicitly fetch DATABASE_URL from the environment
-DATABASE_URL = os.environ.get('DATABASE_URL')
+DATABASE_URL = config('DATABASE_URL', default='')
+
+if not DATABASE_URL:
+    raise ValueError("DATABASE_URL is missing!")
 
 DATABASES = {
     'default': dj_database_url.parse(
-        os.environ.get('DATABASE_URL', ''),
+        DATABASE_URL,
         conn_max_age=600,
         ssl_require=True
     )

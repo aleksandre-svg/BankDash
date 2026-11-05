@@ -204,3 +204,13 @@ print("DATABASE ENGINE:", DATABASES["default"].get("ENGINE"))
 print("DATABASE NAME exists:", bool(DATABASES["default"].get("NAME")))
 print("DATABASE HOST exists:", bool(DATABASES["default"].get("HOST")))
 print("====================================")
+from django.conf import settings as django_settings
+
+print("========== EFFECTIVE DJANGO SETTINGS ==========")
+print("DJANGO_SETTINGS_MODULE:", os.environ.get("DJANGO_SETTINGS_MODULE"))
+print("SETTINGS FILE:", __file__)
+print(
+    "EFFECTIVE DATABASE ENGINE:",
+    django_settings.DATABASES.get("default", {}).get("ENGINE")
+)
+print("================================================")

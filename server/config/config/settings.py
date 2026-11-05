@@ -90,10 +90,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 
 # Explicitly fetch DATABASE_URL from the environment
-DATABASE_URL = config('DATABASE_URL', default='')
-
-if not DATABASE_URL:
-    raise ValueError("DATABASE_URL is missing!")
+DATABASE_URL = config('DATABASE_URL')
 
 DATABASES = {
     'default': dj_database_url.parse(

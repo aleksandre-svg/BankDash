@@ -90,15 +90,31 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 
 # Explicitly fetch DATABASE_URL from the environment
-DATABASE_URL = config('DATABASE_URL')
+import os
+import dj_database_url
+
+DATABASE_URL = os.environ.get("DATABASE_URL")
+
+if not DATABASE_URL:
+    raise RuntimeError("DATABASE_URL is missing from Render!")
 
 DATABASES = {
-    'default': dj_database_url.parse(
+    "default": dj_database_url.parse(
         DATABASE_URL,
         conn_max_age=600,
-        ssl_require=True
+        ssl_require=True,
     )
 }
+
+if not DATABASES["default"].get("ENGINE"):
+    raise RuntimeError("PostgreSQL ENGINE was not configured!")
+
+print("========== DATABASE DEBUG ==========")
+print("DATABASE_URL exists:", bool(os.environ.get("DATABASE_URL")))
+print("DATABASE ENGINE:", DATABASES["default"].get("ENGINE"))
+print("DATABASE NAME exists:", bool(DATABASES["default"].get("NAME")))
+print("DATABASE HOST exists:", bool(DATABASES["default"].get("HOST")))
+print("====================================")
 
 CORS_ALLOWED_ORIGINS = [
     "https://your-frontend-app.vercel.app"

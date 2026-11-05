@@ -110,12 +110,13 @@ if not DATABASES["default"].get("ENGINE"):
 
 
 CORS_ALLOWED_ORIGINS = [
-    "https://your-frontend-app.vercel.app"
+    "https://bank-dash-by-aleksandre.vercel.app"
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    "https://bank-dash-by-aleksandre.vercel.app"
 ]
 
 CSRF_COOKIE_SAMESITE = 'Lax'
@@ -192,20 +193,3 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 
 AUTH_USER_MODEL = 'accounts.User'
-
-print("========== DATABASE DEBUG ==========")
-print("DATABASE_URL exists:", bool(DATABASE_URL))
-print("DATABASE ENGINE:", DATABASES["default"].get("ENGINE"))
-print("DATABASE NAME exists:", bool(DATABASES["default"].get("NAME")))
-print("DATABASE HOST exists:", bool(DATABASES["default"].get("HOST")))
-print("====================================")
-from django.conf import settings as django_settings
-
-print("========== EFFECTIVE DJANGO SETTINGS ==========")
-print("DJANGO_SETTINGS_MODULE:", os.environ.get("DJANGO_SETTINGS_MODULE"))
-print("SETTINGS FILE:", __file__)
-print(
-    "EFFECTIVE DATABASE ENGINE:",
-    django_settings.DATABASES.get("default", {}).get("ENGINE")
-)
-print("================================================")

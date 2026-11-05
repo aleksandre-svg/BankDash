@@ -22,6 +22,8 @@ const baseURL = rawBaseURL.replace(/\/+$/, '') + '/api';
 const api = axios.create({
     baseURL: baseURL,
     withCredentials: true,
+    xsrfCookieName: 'csrftoken', 
+    xsrfHeaderName: 'X-CSRFToken',
     headers: {
         'Content-Type': 'application/json',
     },

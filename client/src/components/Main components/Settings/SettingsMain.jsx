@@ -47,11 +47,12 @@ const EditProfileTab = () => {
         }
 
         try {
-            const { data: updatedUser } = await api.patch('users/me/', data, {
-                headers: { 'Content-Type': 'multipart/form-data' },
-            })
+            const { data: updatedUser } = await api.patch('users/me/', data)
+            
             setFormData(updatedUser)
             setCurrentUser(updatedUser)
+            localStorage.setItem('user', JSON.stringify(updatedUser))
+
             setSuccess('Profile updated successfully!')
             setProfilePicture(null)
         } catch (err) {

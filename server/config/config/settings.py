@@ -29,8 +29,7 @@ SECRET_KEY = config('SECRET_KEY', default='unsafe-default-key')
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.vercel.app']
-
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.vercel.app', '.onrender.com']
 
 # Application definition
 
@@ -94,8 +93,8 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASE_URL = os.environ.get('DATABASE_URL')
 
 DATABASES = {
-    'default': dj_database_url.config(
-        default=config('DATABASE_URL', default=os.environ.get('DATABASE_URL', '')),
+    'default': dj_database_url.parse(
+        os.environ.get('DATABASE_URL', ''),
         conn_max_age=600,
         ssl_require=True
     )
@@ -145,10 +144,10 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 STORAGES = {
     "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
     "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
 

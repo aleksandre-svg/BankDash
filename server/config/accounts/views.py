@@ -33,10 +33,9 @@ class LoginView(APIView):
             user = authenticate(request, username=user_obj.username, password=password)
             if user is not None:
                 login(request, user)
-                print(user)
                 
+                request.session.modified = True
                 request.session.save()
-                request.session.set_expiry(1209600)
                 
                 serializer = UserSerializer(user)
                 return Response(serializer.data, status=status.HTTP_200_OK)
@@ -45,7 +44,7 @@ class LoginView(APIView):
             pass
             
         return Response({'detail': 'Invalid credentials.'}, status=status.HTTP_400_BAD_REQUEST)
-
+    
 class LogoutView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 

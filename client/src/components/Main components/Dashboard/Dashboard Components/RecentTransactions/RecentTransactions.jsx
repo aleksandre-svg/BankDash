@@ -81,7 +81,7 @@ const RecentTransactions = () => {
     return (
         <div className="flex flex-col gap-[20px] w-full">
             <h2 className="text-[#343C6A] text-[22px] font-semibold">Recent Transaction</h2>
-            <div className="w-[350px] bg-white rounded-[25px] py-[25px] px-[20px] flex flex-col gap-[20px] border border-slate-100 shadow-sm">
+            <div className="w-full bg-white rounded-[25px] py-[25px] px-[20px] flex flex-col gap-[20px] border border-slate-100 shadow-sm">
                 {content}
             </div>
         </div>

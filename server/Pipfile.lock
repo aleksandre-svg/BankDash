@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "d8b07f61151429e26e842c6ada64010db1af637ce8e93d87ae529a31f594ffd7"
+            "sha256": "846005ddeba289a7dec2386f39cbcfb53f51ecd08c19c3deda6d7f94126f1726"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -443,6 +443,14 @@
             "markers": "python_version >= '3.10'",
             "version": "==2.9.13"
         },
+        "python-dateutil": {
+            "hashes": [
+                "sha256:a5e246f79eb80475e691bf93862cead98decd8a498cf53ba0516fcdc0f50dc1c",
+                "sha256:d7295ff14fdc0f92f662100bfb6c551d160ca090f2939f1ec5b9794265c03f06"
+            ],
+            "markers": "python_version >= '3.11'",
+            "version": "==4.0.0"
+        },
         "python-decouple": {
             "hashes": [
                 "sha256:ba6e2657d4f376ecc46f77a3a615e058d93ba5e465c01bbe57289bfb7cce680f",
@@ -467,6 +475,13 @@
             "index": "pypi",
             "markers": "python_version >= '3.10'",
             "version": "==2.52.0"
+        },
+        "sib-api-v3-sdk": {
+            "hashes": [
+                "sha256:8975108c4a66ca2280532017190150f98ac826eacdda6c2f859ff104d2828266"
+            ],
+            "index": "pypi",
+            "version": "==7.6.0"
         },
         "six": {
             "hashes": [

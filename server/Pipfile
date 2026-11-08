@@ -16,6 +16,7 @@ psycopg2-binary = "*"
 whitenoise = "*"
 python-decouple = "*"
 resend = "*"
+sib-api-v3-sdk = "*"
 
 [dev-packages]
 

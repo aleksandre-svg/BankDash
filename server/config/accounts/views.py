@@ -121,6 +121,17 @@ class ChangePasswordView(APIView):
     
 resend.api_key = config("RESEND_API_KEY", default="")
 
+import random
+import sib_api_v3_sdk
+from sib_api_v3_sdk.rest import ApiException
+from decouple import config
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def send_verification_code(request):
@@ -141,48 +152,17 @@ def send_verification_code(request):
     html_message = f"""
         <!DOCTYPE html>
         <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Verify Your Email</title>
-        </head>
-        <body style="margin: 0; padding: 0; background-color: #090d16; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #f8fafc;">
-            <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin: 40px auto; background-color: #0f172a; border: 1px solid #1e293b; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);">
-                <tr>
-                    <td align="center" style="padding: 40px 0 20px 0;">
-                        <table border="0" cellpadding="0" cellspacing="0">
-                            <tr>
-                                <td align="center" style="background-color: #4f46e5; width: 48px; height: 48px; border-radius: 12px; color: #ffffff; font-weight: bold; font-size: 20px; line-height: 48px;">
-                                    BD
-                                </td>
-                            </tr>
-                        </table>
-                        <h2 style="margin: 16px 0 0 0; color: #ffffff; font-size: 22px; font-weight: 600; letter-spacing: -0.5px;">BankDash</h2>
-                    </td>
-                </tr>
+        <head><meta charset="UTF-8"><title>Verify Your Email</title></head>
+        <body style="margin: 0; padding: 0; background-color: #090d16; font-family: 'Segoe UI', sans-serif; color: #f8fafc;">
+            <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin: 40px auto; background-color: #0f172a; border: 1px solid #1e293b; border-radius: 16px;">
+                <tr><td align="center" style="padding: 40px 0 20px 0;"><h2 style="color: #ffffff;">BankDash</h2></td></tr>
                 <tr>
                     <td style="padding: 20px 40px 40px 40px; text-align: center;">
-                        <h3 style="margin: 0 0 12px 0; color: #ffffff; font-size: 20px; font-weight: 600;">Confirm your email address</h3>
-                        <p style="margin: 0 0 24px 0; color: #94a3b8; font-size: 15px; line-height: 24px;">
-                            Thanks for getting started with BankDash! Please use the verification code below to complete your registration.
-                        </p>
-                        <table align="center" border="0" cellpadding="0" cellspacing="0" style="margin: 24px 0;">
-                            <tr>
-                                <td align="center" style="background-color: #020617; border: 1px solid #1e293b; border-radius: 12px; padding: 16px 32px;">
-                                    <span style="font-family: monospace; font-size: 32px; font-weight: bold; color: #818cf8; letter-spacing: 6px;">{code}</span>
-                                </td>
-                            </tr>
-                        </table>
-                        <p style="margin: 24px 0 0 0; color: #64748b; font-size: 13px; line-height: 20px;">
-                            This code will expire in 10 minutes. If you didn't request this, you can safely ignore this email.
-                        </p>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="background-color: #020617; padding: 24px; text-align: center; border-top: 1px solid #1e293b;">
-                        <p style="margin: 0; color: #475569; font-size: 12px;">
-                            &copy; 2026 BankDash. All rights reserved.
-                        </p>
+                        <h3 style="color: #ffffff;">Confirm your email address</h3>
+                        <p style="color: #94a3b8;">Please use the verification code below to complete your registration:</p>
+                        <div style="background-color: #020617; border: 1px solid #1e293b; border-radius: 12px; padding: 16px; display: inline-block;">
+                            <span style="font-family: monospace; font-size: 32px; font-weight: bold; color: #818cf8; letter-spacing: 6px;">{code}</span>
+                        </div>
                     </td>
                 </tr>
             </table>
@@ -190,17 +170,20 @@ def send_verification_code(request):
         </html>
     """
     
+    configuration = sib_api_v3_sdk.Configuration()
+    configuration.api_key['api-key'] = config('BREVO_API_KEY', default='')
+    
+    api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
+    send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
+        to=[{"email": user.email}],
+        sender={"name": "BankDash", "email": "datodzukaevi38@gmail.com"},
+        subject="Verify Your Email - BankDash",
+        html_content=html_message
+    )
+    
     try:
-        send_mail(
-            subject="Verify Your Email - BankDash",
-            message=f"Your verification code is: {code}",
-            from_email=None,  # Automatically falls back to DEFAULT_FROM_EMAIL
-            recipient_list=[user.email],
-            html_message=html_message,
-            fail_silently=False,
-        )
-    except Exception as e:
-        print(f"BREVO EMAIL ERROR: {str(e)}")
+        api_instance.send_transac_email(send_smtp_email)
+    except ApiException as e:
         return Response({"error": f"Failed to send email: {str(e)}"}, status=500)
     
     return Response({"message": "Verification code sent successfully!"})

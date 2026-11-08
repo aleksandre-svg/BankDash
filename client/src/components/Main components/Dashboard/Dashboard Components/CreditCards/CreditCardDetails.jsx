@@ -62,7 +62,7 @@ const CreditCardDetails = () => {
 
     const handleFetchRecipientCards = async (e) => {
         e.preventDefault()
-        if (recipientId === currentUser.id){
+        if (recipientId == currentUser.id){
             setError("You can't transfer to your own account. use own transfer below")
             return
         }

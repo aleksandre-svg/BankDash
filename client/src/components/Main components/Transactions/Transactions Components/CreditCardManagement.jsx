@@ -36,7 +36,7 @@ const CreditCardManagement = () => {
     const cardsContent = useMemo(() => {
         if (loading) {
             return (
-                <div className="w-full h-[235px] flex items-center justify-center bg-white rounded-[25px] border border-slate-100 shadow-sm text-sm text-[#718EBF] font-medium">
+                <div className="w-full min-h-[220px] flex items-center justify-center bg-white rounded-[25px] border border-slate-100 shadow-sm text-sm text-[#718EBF] font-medium col-span-full">
                     Loading cards...
                 </div>
             )
@@ -44,7 +44,7 @@ const CreditCardManagement = () => {
 
         if (cards.length === 0) {
             return (
-                <div className="w-full h-[235px] flex flex-col items-center justify-center bg-white rounded-[25px] border border-slate-100 shadow-sm text-sm text-[#718EBF] font-medium gap-2">
+                <div className="w-full min-h-[220px] flex flex-col items-center justify-center bg-white rounded-[25px] border border-slate-100 shadow-sm text-sm text-[#718EBF] font-medium gap-2 col-span-full p-6 text-center">
                     <p>No cards available.</p>
                     <button 
                         type="button"
@@ -58,7 +58,7 @@ const CreditCardManagement = () => {
         }
 
         return cards.slice(0, 2).map((card) => (
-            <div key={card.id} className="w-full">
+            <div key={card.id} className="w-full flex justify-center">
                 <CreditCard 
                     creditCardBalance={card.balance}
                     creditCardHolder={fullName}
@@ -72,19 +72,19 @@ const CreditCardManagement = () => {
     }, [loading, cards, fullName, handleAddCardClick])
 
     return (
-        <section className="flex flex-col gap-[15px] w-full">
+        <section className="flex flex-col gap-4 w-full">
             <div className="flex items-center w-full justify-between">
-                <h3 className="font-semibold text-[22px] text-[#343C6A]">My Cards</h3>
+                <h3 className="font-semibold text-lg sm:text-[22px] text-[#343C6A]">My Cards</h3>
                 <button 
                     type="button" 
                     onClick={handleAddCardClick}
-                    className="font-semibold text-[17px] text-[#343C6A] hover:text-[#1814F3] transition-colors cursor-pointer"
+                    className="font-semibold text-base sm:text-[17px] text-[#343C6A] hover:text-[#1814F3] transition-colors cursor-pointer whitespace-nowrap"
                 >
                     + Add Card
                 </button>
             </div>
             
-            <div className="grid grid-cols-1 lg:grid-cols-2 w-full gap-[20px]">
+            <div className="grid grid-cols-1 xl:grid-cols-2 w-full gap-5">
                 {cardsContent}
             </div>
         </section>

@@ -125,6 +125,7 @@ resend.api_key = config("RESEND_API_KEY", default="")
 @permission_classes([AllowAny])
 def send_verification_code(request):
     email = request.data.get('email')
+    print(email)
     
     if not email:
         return Response({"error": "Email address is required."}, status=400)

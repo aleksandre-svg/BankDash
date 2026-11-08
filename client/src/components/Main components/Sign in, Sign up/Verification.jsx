@@ -19,7 +19,9 @@ const Verification = () => {
         setMessage('')
         setSendingCode(true)
         try {
-            await api.post('auth/send-verification/')
+            await api.post('auth/send-verification/', {
+                email: currentUser.email
+            })
             setMessage('Verification code sent to your email!')
         } catch (err) {
             setError(err.response?.data?.detail || 'Failed to send verification code.')

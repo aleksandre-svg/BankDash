@@ -11,7 +11,7 @@ const Verification = () => {
     const [sendingCode, setSendingCode] = useState(false)
     
     const navigate = useNavigate()
-    const { currentUser } = useContext(UserContext)
+    const { currentUser, setCurrentUser } = useContext(UserContext)
 
 
     const handleSendCode = useCallback(async () => {
@@ -39,6 +39,10 @@ const Verification = () => {
         } catch (err) {
             setError(err.response?.data?.detail || 'Invalid verification code. Try again.')
         } finally {
+            setCurrentUser({
+                ...currentUser,
+                is_email_verified: true
+            })
             setLoading(false)
             navigate('/dashboard')
         }

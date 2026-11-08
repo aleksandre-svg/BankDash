@@ -128,7 +128,7 @@ const Header = ({ pageTitle, onOpenSidebar }) => {
                         )}
                     </div>
 
-                    <div className={`w-[300px] sm:w-[360px] bg-white absolute shadow-xl rounded-[20px] top-[60px] sm:top-[65px] right-0 flex flex-col p-[20px] border border-[#E6EFF5] transition-all duration-200 origin-top-right z-50 ${
+                    <div className={`w-[280px] sm:w-[360px] bg-white absolute shadow-xl rounded-[20px] top-[60px] sm:top-[65px] right-0 flex flex-col p-[20px] border border-[#E6EFF5] transition-all duration-200 origin-top-right z-50 ${
                         showNotifications 
                             ? 'opacity-100 scale-100 pointer-events-auto' 
                             : 'opacity-0 scale-95 pointer-events-none'
@@ -137,7 +137,7 @@ const Header = ({ pageTitle, onOpenSidebar }) => {
                             <div className="flex items-center gap-2">
                                 <h3 className="font-bold text-[16px] text-[#343C6A]">Notifications</h3>
                                 {unreadCount > 0 && (
-                                    <span className="bg-[#FFE8EE] text-[#FE5C73] text-[11px] font-bold px-2 py-0.5 rounded-full">
+                                        <span className="bg-[#FFE8EE] text-[#FE5C73] text-[11px] font-bold px-2 py-0.5 rounded-full">
                                         {unreadCount} new
                                     </span>
                                 )}

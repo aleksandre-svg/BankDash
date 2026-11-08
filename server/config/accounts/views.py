@@ -49,7 +49,7 @@ class LoginView(APIView):
                 
                 response_data = serializer.data
                 response_data['csrf_token'] = csrf_token
-                return Response(serializer.data, status=status.HTTP_200_OK)
+                return Response(response_data, status=status.HTTP_200_OK)
                 
         except User.DoesNotExist:
             pass

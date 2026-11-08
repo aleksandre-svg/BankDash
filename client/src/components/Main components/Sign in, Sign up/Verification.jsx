@@ -13,7 +13,6 @@ const Verification = () => {
     const navigate = useNavigate()
     const { currentUser } = useContext(UserContext)
 
-    console.log(currentUser)
 
     const handleSendCode = useCallback(async () => {
         setError('')

@@ -117,7 +117,7 @@ class ChangePasswordView(APIView):
         return Response({'detail': 'Password changed successfully.'}, status=status.HTTP_200_OK)
     
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def send_verification_code(request):
     user = request.user
     code = f"{random.randint(100000, 999999)}"
@@ -134,7 +134,7 @@ def send_verification_code(request):
     return Response({"detail": "Verification code sent successfully."}, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def verify_email(request):
     user = request.user
     code = request.data.get('code')

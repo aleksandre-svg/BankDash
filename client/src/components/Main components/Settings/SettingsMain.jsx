@@ -43,7 +43,6 @@ const EditProfileTab = () => {
         })
 
         if (profilePicture instanceof File) {
-            console.log('nigger', profilePicture)
             data.append('profile_picture', profilePicture)
         }
 

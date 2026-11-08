@@ -91,6 +91,7 @@ class UserViewSet(viewsets.ModelViewSet):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
+        print("USER UPDATE VALIDATION ERRORS:", serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def get_permissions(self):

@@ -148,7 +148,7 @@ Thank you for your business!
 
   return (
     <div>
-      <div className="flex items-center gap-[60px] border-b border-[#EBEEF2]">
+      <div className="flex items-center gap-[60px] max-md:[10px] border-b border-[#EBEEF2]">
         {renderFilterButton('all', 'All Transactions')}
         {renderFilterButton('income', 'Income')}
         {renderFilterButton('expense', 'Expense')}

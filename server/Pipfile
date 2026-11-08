@@ -15,6 +15,7 @@ dj-database-url = "*"
 psycopg2-binary = "*"
 whitenoise = "*"
 python-decouple = "*"
+resend = "*"
 
 [dev-packages]
 

@@ -67,6 +67,11 @@ const CreditCardDetails = () => {
         setRecipientCards([])
         setSelectedTargetCard("")
 
+        if (recipientId === currentUser.id){
+            setError("You can't transfer to your own account. use own transfer below")
+            return
+        }
+
         try {
             const { data } = await api.get(`users/${recipientId}/cards/`)
             setRecipientCards(data)

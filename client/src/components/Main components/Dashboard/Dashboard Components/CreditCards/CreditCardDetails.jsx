@@ -83,7 +83,7 @@ const CreditCardDetails = () => {
         setSuccess('')
         setError('')
 
-        if (transferAmount <= 0){
+        if (transferAmount < 1){
             setError("Transfer amount should be at least 1$")
             return
         }

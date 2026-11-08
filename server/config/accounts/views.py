@@ -5,6 +5,7 @@ from rest_framework import viewsets, status, permissions
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
 from rest_framework.decorators import action, permission_classes, api_view
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth import authenticate, login, logout
@@ -15,6 +16,7 @@ from cards.serializers import CardSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .serializers import UserSerializer
 from django.conf import settings
+
 from django.middleware.csrf import get_token
 
 @api_view(['GET'])
@@ -72,6 +74,7 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
     
     @action(detail=True, methods=['get'])
     def cards(self, request, pk=None):

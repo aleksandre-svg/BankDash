@@ -5,10 +5,7 @@ const baseURL = rawBaseURL.replace(/\/+$/, '') + '/api'
 
 const api = axios.create({
     baseURL: baseURL,
-    withCredentials: true,
-    headers: {
-        'Content-Type': 'application/json',
-    }
+    withCredentials: true
 })
 
 api.interceptors.request.use((config) => {

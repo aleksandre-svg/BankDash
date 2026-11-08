@@ -47,7 +47,10 @@ const EditProfileTab = () => {
         }
 
         try {
-            const { data: updatedUser } = await api.patch('users/me/', data)
+            const { data: updatedUser } = await api.patch(
+                'users/me/',
+                data
+            )
             
             setFormData(updatedUser)
             setCurrentUser(updatedUser)

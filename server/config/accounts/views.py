@@ -1,4 +1,6 @@
 import random
+import resend
+from decouple import config
 from rest_framework import viewsets, status, permissions
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
@@ -116,6 +118,9 @@ class ChangePasswordView(APIView):
 
         return Response({'detail': 'Password changed successfully.'}, status=status.HTTP_200_OK)
     
+    
+resend.api_key = config("RESEND_API_KEY", default="")
+
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def send_verification_code(request):
@@ -123,15 +128,79 @@ def send_verification_code(request):
     code = f"{random.randint(100000, 999999)}"
     user.verification_code = code
     user.save(update_fields=['verification_code'])
+    
+    try:
+        params = {
+            "from": "onboarding@resend.dev",  
+            "to": [user.email],
+            "subject": "Verify Your Email - BankDash",
+            "html": f"""
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Verify Your Email</title>
+                </head>
+                <body style="margin: 0; padding: 0; background-color: #090d16; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #f8fafc;">
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin: 40px auto; background-color: #0f172a; border: 1px solid #1e293b; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);">
+                        
+                        <!-- Header Logo / Brand -->
+                        <tr>
+                            <td align="center" style="padding: 40px 0 20px 0;">
+                                <table border="0" cellpadding="0" cellspacing="0">
+                                    <tr>
+                                        <td align="center" style="background-color: #4f46e5; width: 48px; height: 48px; border-radius: 12px; color: #ffffff; font-weight: bold; font-size: 20px; line-height: 48px;">
+                                            BD
+                                        </td>
+                                    </tr>
+                                </table>
+                                <h2 style="margin: 16px 0 0 0; color: #ffffff; font-size: 22px; font-weight: 600; letter-spacing: -0.5px;">BankDash</h2>
+                            </td>
+                        </tr>
 
-    send_mail(
-        'Verify Your Email - BankDash',
-        f'Your verification code is: {code}',
-        settings.EMAIL_HOST_USER,
-        [user.email],
-        fail_silently=False,
-    )
-    return Response({"detail": "Verification code sent successfully."}, status=status.HTTP_200_OK)
+                        <!-- Content Area -->
+                        <tr>
+                            <td style="padding: 20px 40px 40px 40px; text-align: center;">
+                                <h3 style="margin: 0 0 12px 0; color: #ffffff; font-size: 20px; font-weight: 600;">Confirm your email address</h3>
+                                <p style="margin: 0 0 24px 0; color: #94a3b8; font-size: 15px; line-height: 24px;">
+                                    Thanks for getting started with BankDash! Please use the verification code below to complete your registration.
+                                </p>
+
+                                <!-- Verification Code Box -->
+                                <table align="center" border="0" cellpadding="0" cellspacing="0" style="margin: 24px 0;">
+                                    <tr>
+                                        <td align="center" style="background-color: #020617; border: 1px solid #1e293b; border-radius: 12px; padding: 16px 32px;">
+                                            <span style="font-family: monospace; font-size: 32px; font-weight: bold; color: #818cf8; letter-spacing: 6px;">{code}</span>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <p style="margin: 24px 0 0 0; color: #64748b; font-size: 13px; line-height: 20px;">
+                                    This code will expire in 10 minutes. If you didn't request this, you can safely ignore this email.
+                                </p>
+                            </td>
+                        </tr>
+
+                        <!-- Footer -->
+                        <tr>
+                            <td style="background-color: #020617; padding: 24px; text-align: center; border-top: 1px solid #1e293b;">
+                                <p style="margin: 0; color: #475569; font-size: 12px;">
+                                    &copy; 2026 BankDash. All rights reserved.
+                                </p>
+                            </td>
+                        </tr>
+
+                    </table>
+                </body>
+                </html>
+                """,
+        }
+        resend.Emails.send(params)
+    except Exception as e:
+        return Response({"error": f"Failed to send email: {str(e)}"}, status=500)
+    
+    return Response({"message": "Verification code sent successfully!"})
 
 @api_view(['POST'])
 @permission_classes([AllowAny])

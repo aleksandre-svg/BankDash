@@ -22,6 +22,8 @@ const LoginTab = () => {
             const response = await api.post('login/', loginData);
             const foundUser = response.data;
 
+            console.log(foundUser)
+
             localStorage.setItem('user', JSON.stringify(foundUser))
             if (foundUser.csrf_token) {
                 localStorage.setItem('csrftoken', foundUser.csrf_token)

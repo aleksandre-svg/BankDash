@@ -140,7 +140,7 @@ def send_verification_code(request):
     
     try:
         params = {
-            "from": "BankDash <onboarding@resend.dev>",  
+            "from": "onboarding@resend.dev",  
             "to": [user.email],
             "subject": "Verify Your Email - BankDash",
             "html": f"""

@@ -119,6 +119,11 @@ const CreditCardDetails = () => {
         setSuccess('')
         setError('')
 
+        if (ownTransferAmount < 1){
+            setError("Transfer amount should be at least 1$")
+            return
+        }
+
         if (parseFloat(ownTransferAmount) > parseFloat(card.balance)) {
             setError("Transfer amount exceeds card balance")
             return

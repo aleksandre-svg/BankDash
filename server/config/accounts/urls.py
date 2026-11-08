@@ -12,5 +12,5 @@ urlpatterns = [
     path('change-password/', ChangePasswordView.as_view(), name='change-password'),
     path('auth/send-verification/', send_verification_code, name='send-verification'),
     path('auth/verify-email/', verify_email, name='verify-email'),
-    path('api/get-csrf/', get_csrf, name='get_csrf'),
+    path('get-csrf/', get_csrf, name='get_csrf'),
 ]
